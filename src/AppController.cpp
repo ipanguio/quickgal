@@ -42,5 +42,8 @@ void AppController::refreshAlbums()
                QVector<Album> albums =
         m_scanner.scanAlbums(m_rootPath);
 
+        qWarning() <<"Albumes encontrados:"
+                   << albums.size();
+
     m_albumModel->setAlbums(albums);
 }

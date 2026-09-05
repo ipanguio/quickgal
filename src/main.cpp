@@ -12,27 +12,21 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    MediaScanner scanner;
-    scanner.setShowNoMedia(false);
-
-    QVector<Album> albums =
-            scanner.scanAlbums("/home/phablet/Pictures");
-    
-    qWarning() << "Albumes encontrados:" << albums.size();
-
     AlbumModel albumModel;
 
     AppController appController(&albumModel);
-
     appController.refreshAlbums();
     
-    // albumModel.setAlbums(albums);
-
     QQmlApplicationEngine engine;
 
     engine.rootContext()->setContextProperty(
         "albumModel",
         &albumModel
+    );
+
+    engine.rootContext()->setContextProperty(
+        "appController",
+        &appController
     );
 
     QString qmlPath =
