@@ -1,0 +1,15 @@
+{
+    "name": "quickgal.nacho",
+    "description": "Quick gallery app",
+    "architecture": "$ENV{ARCH}",
+    "title": "QuickGal",
+    "hooks": {
+        "quickgal": {
+            "apparmor": "quickgal.apparmor",
+            "desktop":  "quickgal.desktop"
+        }
+    },
+    "version": "1.0.1",
+    "maintainer": "Ignacio Perez Anguio <i.perez.anguio@gmail.com>",
+    "framework" : "$ENV{CLICK_FRAMEWORK}"
+}
