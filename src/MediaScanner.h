@@ -5,6 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include "AlbumModel.h"
+#include "MediaModel.h"
 
 class MediaScanner : public QObject
 {
@@ -16,7 +17,11 @@ public:
     // Scan a given directoy and return media files.
     QStringList scan(const QString &rootPath);
 
+    //Returns found albums
     QVector<Album> scanAlbums(const QString &rootPath);
+
+    //Returns found pictures and videos found in a given directory
+    QVector<MediaItem> scanDirectory(const QString &directoryPath);
 
     // Decide whether this directory is shown or not based on .nomedia.
     void setShowNoMedia(bool show);
@@ -31,6 +36,7 @@ private:
     
     bool isMediaFile(const QString &filePath) const;
     bool hasNoMedia(const QString &directoryPath) const;
+
 };
 
 #endif // MEDIASCANNER_H

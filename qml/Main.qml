@@ -16,141 +16,261 @@ Window {
         id: mainView
 
         anchors.fill: parent
-
         applicationName: "quickgal.nacho"
 
-        Page {
-            id: page
+        PageStack {
+            id: pageStack
 
-            header: PageHeader {
-                id: pageHeader
-                title: "QuickGal"
+            anchors.fill: parent
+
+            Component.onCompleted: {
+                push(albumsPage)
             }
+        }
 
-            Row {
-                id: optionsRow
+        Component {
+            id: albumsPage
 
-                anchors {
-                    top: pageHeader.bottom
-                    left: parent.left
-                    right: parent.right
-                    leftMargin: units.gu(2)
-                    rightMargin: units.gu(2)
+            Page {
+                id: page
+
+                header: PageHeader {
+                    id: pageHeader
+                    title: "QuickGal"
                 }
 
-                height: units.gu(7)
-                spacing: units.gu(2)
+                Row {
+                    id: optionsRow
 
-                Label {
-                    text: "Mostrar álbumes ocultos"
-                    anchors.verticalCenter:
-                    parent.verticalCenter
-                }
+                    anchors {
+                        top: pageHeader.bottom
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: units.gu(2)
+                        rightMargin: units.gu(2)
+                    }
 
-                Switch {
-                    id: hiddenSwitch
+                    height: units.gu(7)
+                    spacing: units.gu(2)
 
-                    anchors.verticalCenter: parent.verticalCenter
+                    Label {
+                        text: "Mostrar álbumes ocultos"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
 
-                    checked: appController.showHiddenAlbums
+                    Switch {
+                        id: hiddenSwitch
 
-                    onCheckedChanged: {
-                        console.log(
-                            "Swith ocultos:",
-                            checked
-                        )
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        appController.showHiddenAlbums =
-                            checked
+                        checked: appController.showHiddenAlbums
+
+                        onCheckedChanged: {
+                            console.log(
+                                "Switch ocultos:",
+                                checked
+                            )
+
+                            appController.showHiddenAlbums = checked
+                        }
                     }
                 }
-            }
 
-            GridView {
-                id: albumGrid
+                GridView {
+                    id: albumGrid
 
-                anchors {
-                    top: optionsRow.bottom
-                    left: parent.left
-                    right: parent.right
-                    bottom: parent.bottom
-                }
+                    anchors {
+                        top: optionsRow.bottom
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
 
-                clip: true
+                    clip: true
 
-                cellWidth: width / 2
-                cellHeight: units.gu(26)
+                    cellWidth: width / 2
+                    cellHeight: units.gu(26)
 
-                model: albumModel
+                    model: albumModel
 
-                delegate: Item {
-                    width: albumGrid.cellWidth
-                    height: albumGrid.cellHeight
+                    delegate: Item {
+                        width: albumGrid.cellWidth
+                        height: albumGrid.cellHeight
 
-                    Rectangle {
-                        anchors {
-                            fill: parent
-                            margins: units.gu(1)
-                        }
-
-                        color: theme.palette.normal.background
-
-                        Column {
+                        Rectangle {
                             anchors {
                                 fill: parent
                                 margins: units.gu(1)
                             }
 
-                            spacing: units.gu(0.5)
+                            color: theme.palette.normal.background
 
-                            Rectangle {
-                                width: parent.width
-                                height: units.gu(18)
+                            Column {
+                                anchors {
+                                    fill: parent
+                                    margins: units.gu(1)
+                                }
 
-                                color: "#cccccc"
+                                spacing: units.gu(0.5)
 
-                                Image {
-                                    anchors.fill: parent
+                                Rectangle {
+                                    width: parent.width
+                                    height: units.gu(18)
 
-                                    source: "file://" + coverPath
+                                    color: "#cccccc"
 
-                                    fillMode: Image.PreserveAspectCrop
+                                    Image {
+                                        anchors.fill: parent
 
-                                    asynchronous: true
-                                    cache: true
+                                        source: "file://" + coverPath
 
-                                    onStatusChanged: {
-                                        if (status === Image.Error) {
-                                            console.log(
-                                                "Error cargando portada:",
-                                                coverPath
-                                            )
-                                        }
+                                        fillMode: Image.PreserveAspectCrop
+
+                                        asynchronous: true
+                                        cache: true
                                     }
+                                }
+
+                                Label {
+                                    width: parent.width
+
+                                    text: name
+
+                                    font.bold: true
+                                    elide: Text.ElideRight
+                                }
+
+                                Label {
+                                    text: count + " elementos"
                                 }
                             }
 
-                            Label {
-                                width: parent.width
+                            MouseArea {
+                                anchors.fill: parent
 
-                                text: name
+                                onClicked: {
+                                    console.log(
+                                        "Abriendo el album:",
+                                        name,
+                                        path
+                                    )
 
-                                font.bold: true
-                                elide: Text.ElideRight
-                            }
+                                    appController.openAlbum(path)
 
-                            Label {
-                                text: count + " elementos"
+                                    pageStack.push(
+                                        albumPageComponent,
+                                        {
+                                            albumName: name
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
 
-                Component.onCompleted: {
-                    console.log(
-                        "AlbumGrid creado. Elementos:",
-                        count
-                    )
+        Component {
+            id: albumPageComponent
+
+            Page {
+                id: albumPage
+
+                property string albumName: ""
+
+                header: PageHeader {
+                    id: albumHeader
+                    title: albumPage.albumName
+                }
+
+                GridView {
+                    id: mediaGrid
+
+                    anchors {
+                        top: albumHeader.bottom
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+
+                    model: mediaModel
+
+                    cellWidth: width / 3
+                    cellHeight: cellWidth
+
+                    delegate: Item {
+                        width: mediaGrid.cellWidth
+                        height: mediaGrid.cellHeight
+
+                        Image {
+                            anchors {
+                                fill: parent
+                                margins: units.gu(0.25)
+                            }
+
+                            source: "file://" + path
+
+                            fillMode: Image.PreserveAspectCrop
+
+                            asynchronous: true
+                            cache: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+
+                            onClicked: {
+                                console.log("Abriendo imagen:", path)
+
+                                pageStack.push(
+                                    imagePageComponent,
+                                    {
+                                        imagePath: path,
+                                        imageName: fileName
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Component {
+            id: imagePageComponent
+
+            Page {
+                id: imagePage
+
+                property string imagePath: ""
+                property string imageName: ""
+
+                header: PageHeader {
+                    id: imageHeader
+                    title: imagePage.imageName
+                }
+
+                Rectangle {
+                    anchors {
+                        top: imageHeader.bottom
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+
+                    color: "black"
+
+                    Image {
+                        anchors.fill: parent
+
+                        source: "file://" + imagePage.imagePath
+
+                        fillMode: Image.PreserveAspectFit
+
+                        asynchronous: true
+                        cache: true
+                    }
                 }
             }
         }

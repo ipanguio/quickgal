@@ -2,9 +2,11 @@
 #define APPCONTROLLER_H
 
 #include <QObject>
+#include <QString>
 
 #include "MediaScanner.h"
 #include "AlbumModel.h"
+#include "MediaModel.h"
 
 class AppController : public QObject
 {
@@ -16,8 +18,11 @@ class AppController : public QObject
                NOTIFY showHiddenAlbumsChanged)
 
 public:
-    explicit AppController(AlbumModel *albumModel,
-                           QObject *parent = nullptr);
+    explicit AppController(
+        AlbumModel *albumModel,
+        MediaModel *mediaModel,
+        QObject *parent = nullptr
+    );
 
     bool showHiddenAlbums() const;
 
@@ -25,12 +30,17 @@ public:
 
     Q_INVOKABLE void refreshAlbums();
 
+    Q_INVOKABLE void openAlbum(
+        const QString &path
+    );
+
 signals:
     void showHiddenAlbumsChanged();
 
 private:
     MediaScanner m_scanner;
     AlbumModel *m_albumModel;
+    MediaModel *m_mediaModel;
 
     bool m_showHiddenAlbums = false;
 

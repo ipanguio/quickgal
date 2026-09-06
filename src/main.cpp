@@ -7,14 +7,19 @@
 #include "MediaScanner.h"
 #include "AlbumModel.h"
 #include "AppController.h"
+#include "MediaModel.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     AlbumModel albumModel;
+    MediaModel mediaModel;
 
-    AppController appController(&albumModel);
+    AppController appController(
+        &albumModel,
+        &mediaModel
+    );
     appController.refreshAlbums();
     
     QQmlApplicationEngine engine;
@@ -22,6 +27,11 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(
         "albumModel",
         &albumModel
+    );
+
+    engine.rootContext()->setContextProperty(
+        "mediaModel",
+        &mediaModel
     );
 
     engine.rootContext()->setContextProperty(

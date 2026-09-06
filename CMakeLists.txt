@@ -76,7 +76,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/MediaScanner.cpp
     src/AlbumModel.cpp
-    src/AlbumModel.cpp
+    src/MediaModel.cpp
     src/AppController.cpp
 )
 

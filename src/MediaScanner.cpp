@@ -167,3 +167,44 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
 
     return albums;
 }
+
+QVector<MediaItem> MediaScanner::scanDirectory(
+    const QString &directoryPath
+)
+{
+    QVector<MediaItem> items;
+
+    QDir directory(directoryPath);
+
+    if (!directory.exists()) {
+        return items;
+    }
+
+    QFileInfoList files =
+        directory.entryInfoList(
+            QDir::Files | QDir::NoDotAndDotDot,
+            QDir::Time
+        );
+
+    for (const QFileInfo &fileInfo : files) {
+
+        if (!isMediaFile(fileInfo.absoluteFilePath())) {
+            continue;
+        }
+
+        MediaItem item;
+
+        item.path = fileInfo.absoluteFilePath();
+        item.fileName = fileInfo.fileName();
+
+        const QString extension =
+            fileInfo.suffix().toLower();
+
+        item.isVideo =
+            m_videoExtensions.contains(extension);
+
+        items.append(item);
+    }
+
+    return items;
+}
