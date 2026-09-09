@@ -34,6 +34,11 @@ public:
         const QString &path
     );
 
+    Q_INVOKABLE void sortMedia(
+        const QString &field,
+        bool ascending
+    );
+
 signals:
     void showHiddenAlbumsChanged();
 

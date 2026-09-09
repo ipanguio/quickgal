@@ -63,3 +63,19 @@ void AppController::openAlbum(
 
     m_mediaModel->setItems(items);
 }
+void AppController::sortMedia(
+    const QString &field,
+    bool ascending
+)
+{
+    qWarning()
+        << "Ordenando por:"
+        << field
+        << "ascendente:"
+        << ascending;
+
+    m_mediaModel->sortItems(
+        field,
+        ascending
+    );
+}

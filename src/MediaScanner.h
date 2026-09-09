@@ -37,6 +37,11 @@ private:
     bool isMediaFile(const QString &filePath) const;
     bool hasNoMedia(const QString &directoryPath) const;
 
+    bool isInsideNoMediaTree(
+        const QString &directoryPath,
+        const QString &rootPath
+    ) const;
+
 };
 
 #endif // MEDIASCANNER_H

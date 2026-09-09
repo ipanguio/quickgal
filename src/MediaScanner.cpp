@@ -4,6 +4,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QMap>
+#include <algorithm>
 
 MediaScanner::MediaScanner(QObject *parent)
     : QObject(parent),
@@ -58,9 +59,8 @@ QStringList MediaScanner::scan(const QString &rootPath)
             bool hiddenByNoMedia = false;
 
             /*
-             * Comprobamos este directorio y sus padres
-             * hasta llegar al directorio raíz que estamos
-             * escaneando.
+             * We check this directoy and its parents
+             * until we reach the root directory we are scanning
              */
             while (directoryPath.startsWith(rootPath)) {
 
@@ -135,34 +135,67 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
 {
     QVector<Album> albums;
 
-    const QStringList files = scan(rootPath);
+    QDir rootDir(rootPath);
 
-    QMap<QString, Album> albumMap;
-
-    for (const QString &filePath : files) {
-        QFileInfo fileInfo(filePath);
-        const QString directoryPath = fileInfo.absolutePath();
-        if (!albumMap.contains(directoryPath)) {
-            Album album;
-            album.path = directoryPath;
-            QDir directory(directoryPath);
-            album.name = directory.dirName();
-            album.coverPath = filePath;
-            album.count = 1;
-            albumMap.insert(directoryPath, album);
-
-        } else {
-
-            Album &album = albumMap[directoryPath];
-            album.count++;
-        }
+    if (!rootDir.exists()) {
+        return albums;
     }
 
-    for (auto it = albumMap.constBegin();
-         it != albumMap.constEnd();
-         ++it) {
+    QStringList directories;
+    directories.append(rootPath);
 
-        albums.append(it.value());
+    QDirIterator dirIterator(
+        rootPath,
+        QDir::Dirs | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories
+    );
+
+    while (dirIterator.hasNext()) {
+        directories.append(dirIterator.next());
+    }
+
+    for (const QString &directoryPath : directories) {
+
+        /*
+         * If the directory is hidden by a .nomedia file
+         * we skip it and its subdirectories
+         */
+
+        if (!m_showNoMedia && hasNoMedia(directoryPath)) {
+            continue;
+        }
+
+        QDir directory(directoryPath);
+
+        QFileInfoList files =
+            directory.entryInfoList(
+                QDir::Files | QDir::NoDotAndDotDot,
+                QDir::Time
+            );
+        
+        Album album;
+        
+        album.name = directory.dirName();
+        album.path = directoryPath;
+        album.count = 0;
+
+        for (const QFileInfo &fileInfo : files) {
+            const QString filePath = fileInfo.absoluteFilePath();
+
+            if (!isMediaFile(filePath)) {
+                continue;
+            }
+
+            if (album.count == 0) {
+                album.coverPath = filePath;
+            }
+
+            ++album.count;
+        }
+
+        if (album.count > 0) {
+            albums.append(album);
+        }          
     }
 
     return albums;
@@ -202,6 +235,18 @@ QVector<MediaItem> MediaScanner::scanDirectory(
 
         item.isVideo =
             m_videoExtensions.contains(extension);
+
+        item.size = fileInfo.size();
+
+        item.modified =
+            fileInfo.lastModified();
+
+        item.created =
+            fileInfo.birthTime();
+
+        if (!item.created.isValid()) {
+            item.created = item.modified;
+        }
 
         items.append(item);
     }

@@ -17,29 +17,38 @@ set(FULL_PROJECT_NAME "quickgal.nacho")
 set(DATA_DIR /)
 set(DESKTOP_FILE_NAME ${PROJECT_NAME}.desktop)
 
+# Translations
+file(GLOB_RECURSE I18N_SRC_FILES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/po
+    qml/*.qml
+    qml/*.js
+)
+
+list(APPEND I18N_SRC_FILES
+    ${DESKTOP_FILE_NAME}.in.h
+)
+
+# Find intltool BEFORE processing po/CMakeLists.txt 
+find_program(INTLTOOL_MERGE intltool-merge)
+IF (NOT INTLTOOL_MERGE)
+    message(FATAL_ERROR "Could not find intltool-merge, please install the intltool package")
+ENDIF()
+
+find_program(INTLTOOL_EXTRACT intltool-extract)
+IF (NOT INTLTOOL_EXTRACT)
+    message(FATAL_ERROR "Could not find intltool-extract, please install the intltool package")
+ENDIF()
+
+add_subdirectory(po)
+
 configure_file(
     manifest.json.in
     ${CMAKE_CURRENT_BINARY_DIR}/manifest.json
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/manifest.json DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${PROJECT_NAME}.apparmor DESTINATION ${DATA_DIR})
-
 install(DIRECTORY assets DESTINATION ${DATA_DIR})
-
 install(DIRECTORY qml DESTINATION ${DATA_DIR})
-
-# Translations
-file(GLOB_RECURSE I18N_SRC_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} /po qml/*.qml qml/*.js)
-list(APPEND I18N_SRC_FILES ${DESKTOP_FILE_NAME}.in.h)
-
-find_program(INTLTOOL_MERGE intltool-merge)
-if(NOT INTLTOOL_MERGE)
-    message(FATAL_ERROR "Could not find intltool-merge, please install the intltool package")
-endif()
-find_program(INTLTOOL_EXTRACT intltool-extract)
-if(NOT INTLTOOL_EXTRACT)
-    message(FATAL_ERROR "Could not find intltool-extract, please install the intltool package")
-endif()
 
 add_custom_target(${DESKTOP_FILE_NAME} ALL
     COMMENT "Merging translations into ${DESKTOP_FILE_NAME}..."
@@ -49,9 +58,7 @@ add_custom_target(${DESKTOP_FILE_NAME} ALL
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${DESKTOP_FILE_NAME} DESTINATION ${DATA_DIR})
 
-# add_subdirectory(po)
-
-# Make source files visible in qtcreator
+# Make source files visible in QtCreator
 file(GLOB_RECURSE PROJECT_SRC_FILES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     qml/*.qml
@@ -90,5 +97,3 @@ target_link_libraries(${PROJECT_NAME}
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION ${DATA_DIR}
 )
-
-install(DIRECTORY qml DESTINATION ${DATA_DIR})

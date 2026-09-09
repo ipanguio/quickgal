@@ -1,6 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import Lomiri.Components 1.3
+import Lomiri.Components.Popups 1.3
 
 Window {
     id: window
@@ -48,15 +49,15 @@ Window {
                         right: parent.right
                         leftMargin: units.gu(2)
                         rightMargin: units.gu(2)
-                    }
+                        }
 
                     height: units.gu(7)
                     spacing: units.gu(2)
 
                     Label {
-                        text: "Mostrar álbumes ocultos"
+                        text: i18n.tr("Mostrar álbumes ocultos")
                         anchors.verticalCenter: parent.verticalCenter
-                    }
+                        }
 
                     Switch {
                         id: hiddenSwitch
@@ -126,6 +127,9 @@ Window {
 
                                         fillMode: Image.PreserveAspectCrop
 
+                                        sourceSize.width: width
+                                        sourceSize.height: height
+
                                         asynchronous: true
                                         cache: true
                                     }
@@ -141,7 +145,7 @@ Window {
                                 }
 
                                 Label {
-                                    text: count + " elementos"
+                                    text: i18n.tr("%1 elementos", count)
                                 }
                             }
 
@@ -182,6 +186,23 @@ Window {
                 header: PageHeader {
                     id: albumHeader
                     title: albumPage.albumName
+
+                    trailingActionBar.actions: [
+                        Action {
+                            text: i18n.tr("Opciones")
+                            iconName: "navigation-menu"
+
+                            onTriggered: {
+                                console.log("Abriendo menú del album")
+
+                                PopupUtils.open(
+                                    albumMenuComponent,
+                                    albumHeader
+                                )
+                                
+                            }
+                        }
+                    ]
                 }
 
                 GridView {
@@ -210,8 +231,10 @@ Window {
                             }
 
                             source: "file://" + path
-
                             fillMode: Image.PreserveAspectCrop
+
+                            sourceSize.width: width
+                            sourceSize.height: height
 
                             asynchronous: true
                             cache: true
@@ -221,14 +244,165 @@ Window {
                             anchors.fill: parent
 
                             onClicked: {
-                                console.log("Abriendo imagen:", path)
+                                console.log("Abriendo imagen:",
+                                    path,
+                                    "índice:",
+                                    index
+                                )
 
                                 pageStack.push(
                                     imagePageComponent,
                                     {
-                                        imagePath: path,
-                                        imageName: fileName
+                                        initialIndex: index
                                     }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: albumMenuComponent
+
+                    Popover {
+                        id: albumMenu
+
+                        Column {
+                            width: units.gu(25)
+
+                            ListItem {
+                                height: units.gu(6)
+
+                                ListItemLayout {
+                                    title.text:i18n.tr("Ordenar por")
+                                }
+
+                                onClicked: {
+                                    PopupUtils.close(albumMenu)
+
+                                    pageStack.push(
+                                        sortPageComponent
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Component {
+            id: sortPageComponent
+
+            Page {
+                id: sortPage
+
+                property string sortField: "name"
+                property bool ascending: true
+
+                header: PageHeader {
+                    id: sortHeader
+                    title: i18n.tr("Ordenar por")
+                }
+
+                Flickable {
+                    id: sortFlickable
+
+                    anchors {
+                        top: sortHeader.bottom
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+
+                    clip: true
+
+                    contentWidth: width
+                    contentHeight: sortColumn.height
+
+                    Column {
+                        id: sortColumn
+
+                        width: sortFlickable.width
+
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            leftMargin: units.gu(2)
+                            rightMargin: units.gu(2)
+                        }
+
+                        spacing: units.gu(2)
+
+                        Label {
+                            text: i18n.tr("Criterio")
+                            font.bold: true
+                        }
+
+                        OptionSelector {
+                            id: sortFieldSelector
+
+                            width: parent.width
+
+                            model: [
+                                i18n.tr("Nombre"),
+                                i18n.tr("Ruta"),
+                                i18n.tr("Tamaño"),
+                                i18n.tr("Fecha de modificación"),
+                                i18n.tr("Fecha de creación")
+                            ]
+
+                            selectedIndex: 0
+
+                            onSelectedIndexChanged: {
+                                switch (selectedIndex) {
+                                case 0:
+                                    sortPage.sortField = "name"
+                                    break
+                                case 1:
+                                    sortPage.sortField = "path"
+                                    break
+                                case 2:
+                                    sortPage.sortField = "size"
+                                    break
+                                case 3:
+                                    sortPage.sortField = "modified"
+                                    break
+                                case 4:
+                                    sortPage.sortField = "created"
+                                    break
+                                }
+                                appController.sortMedia(
+                                    sortPage.sortField,
+                                    sortPage.ascending
+                                )
+                            }
+                        }
+
+                        Label {
+                            text: i18n.tr("Dirección")
+                            font.bold: true
+                        }
+
+                        OptionSelector {
+                            id: sortDirectionSelector
+
+                            width: parent.width
+
+                            model: [
+                                i18n.tr("Ascendente"),
+                                i18n.tr("Descendente")
+                            ]
+
+                            selectedIndex: 0
+
+                            onSelectedIndexChanged: {
+                                sortPage.ascending =
+                                    selectedIndex === 0
+
+                                appController.sortMedia(
+                                    sortPage.sortField,
+                                    sortPage.ascending
                                 )
                             }
                         }
@@ -243,15 +417,20 @@ Window {
             Page {
                 id: imagePage
 
-                property string imagePath: ""
-                property string imageName: ""
+                property int initialIndex: 0
 
                 header: PageHeader {
                     id: imageHeader
-                    title: imagePage.imageName
+                    title: imageViewer.count > 0 
+                        ? (imageViewer.currentIndex +1)
+                        + "/"
+                        + imageViewer.count
+                        :""
                 }
 
-                Rectangle {
+                ListView {
+                    id: imageViewer
+
                     anchors {
                         top: imageHeader.bottom
                         left: parent.left
@@ -259,17 +438,219 @@ Window {
                         bottom: parent.bottom
                     }
 
-                    color: "black"
+                    orientation: ListView.Horizontal
 
-                    Image {
-                        anchors.fill: parent
+                    model: mediaModel
 
-                        source: "file://" + imagePage.imagePath
+                    currentIndex: imagePage.initialIndex
 
-                        fillMode: Image.PreserveAspectFit
+                    snapMode: ListView.SnapOneItem
 
-                        asynchronous: true
-                        cache: true
+                    highlightRangeMode:
+                        ListView.StrictlyEnforceRange
+
+                    preferredHighlightBegin: 0
+                    preferredHighlightEnd: 0
+
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    clip: true
+
+                    delegate: Rectangle {
+                        width: imageViewer.width
+                        height: imageViewer.height
+
+                        color: "black"
+
+                        Flickable {
+                            id: imageFlickable
+
+                            anchors.fill: parent
+                            clip: true
+
+                            property real zoom: 1.0
+                            property real minZoom: 1.0
+                            property real maxZoom: 5.0
+                            property bool pinching: false
+
+                            contentWidth: width * zoom
+                            contentHeight: height * zoom
+
+                            interactive: zoom > 1.0 && !pinching
+                            boundsBehavior: Flickable.StopAtBounds
+
+                            Item {
+                                id: imageContainer
+
+                                width: imageFlickable.width
+                                height: imageFlickable.height
+
+                                scale: imageFlickable.zoom
+                                transformOrigin: Item.TopLeft
+
+                                Image {
+                                    anchors.fill: parent
+
+                                    source: "file://" + path
+                                    fillMode: Image.PreserveAspectFit
+
+                                    asynchronous: true
+                                    cache: true
+                                    smooth: true
+                                }
+                            }
+
+                            onZoomChanged: {
+                                if (zoom <= minZoom) {
+                                    zoom = minZoom
+
+                                    contentX = 0
+                                    contentY = 0
+
+                                    imageViewer.interactive = true
+                                } else {
+                                    imageViewer.interactive = false
+                                }
+                            }
+                        }
+
+                        PinchArea {
+                            id: imagePinch
+
+                            anchors.fill: parent
+
+                            property real startZoom: 1.0
+
+                            property real imagePointX: 0.0
+                            property real imagePointY: 0.0
+
+                            property real smoothCenterX: 0.0
+                            property real smoothCenterY: 0.0
+
+                            property real smoothing: 0.20
+
+                            onPinchStarted: {
+                                imageFlickable.pinching = true
+
+                                imageFlickable.cancelFlick()
+
+                                startZoom = imageFlickable.zoom
+
+                                smoothCenterX = pinch.center.x
+                                smoothCenterY = pinch.center.y
+
+                                /*
+                                * Store original point of the image
+                                * placed behind the pinched area.
+                                */
+                                imagePointX =
+                                    (imageFlickable.contentX + smoothCenterX)
+                                    / startZoom
+
+                                imagePointY =
+                                    (imageFlickable.contentY + smoothCenterY)
+                                    / startZoom
+
+                                imageViewer.interactive = false
+                            }
+
+                            onPinchUpdated: {
+                            var newZoom =
+                                startZoom * pinch.scale
+
+                            if (newZoom < imageFlickable.minZoom) {
+                                newZoom = imageFlickable.minZoom
+                            }
+
+                            if (newZoom > imageFlickable.maxZoom) {
+                                newZoom = imageFlickable.maxZoom
+                            }
+
+                            smoothCenterX =
+                                smoothCenterX
+                                + (pinch.center.x - smoothCenterX)
+                                * smoothing
+
+                            smoothCenterY =
+                                smoothCenterY
+                                + (pinch.center.y - smoothCenterY)
+                                * smoothing
+
+                            imageFlickable.zoom = newZoom
+
+                            /*
+                             * Preserve point under finger
+                             * since zoom was started.
+                             */
+                            var newContentX =
+                                imagePointX * newZoom
+                                - smoothCenterX
+
+                            var newContentY =
+                                imagePointY * newZoom
+                                - smoothCenterY
+
+                            var maxX =
+                                Math.max(
+                                0,
+                                imageFlickable.width * newZoom
+                                - imageFlickable.width
+                            )
+
+                            var maxY =
+                                Math.max(
+                                0,
+                                imageFlickable.height * newZoom
+                                - imageFlickable.height
+                            )
+
+                            imageFlickable.contentX =
+                                Math.max(
+                                    0,
+                                    Math.min(newContentX, maxX)
+                                )
+
+                            imageFlickable.contentY =
+                                Math.max(
+                                    0,
+                                    Math.min(newContentY, maxY)
+                                )
+                            }
+
+                            onPinchFinished: {
+                            imageFlickable.pinching = false
+
+                            if (imageFlickable.zoom <=
+                                    imageFlickable.minZoom) {
+
+                                imageFlickable.zoom =
+                                    imageFlickable.minZoom
+
+                                imageFlickable.contentX = 0
+                                imageFlickable.contentY = 0
+
+                                imageViewer.interactive = true
+                            } else {
+                                imageViewer.interactive = false
+                            }
+                            }
+                        }
+                    }           
+
+                    Component.onCompleted: {
+                        positionViewAtIndex(
+                            initialIndex,
+                            ListView.Beginning
+                        )
+
+                        currentIndex = initialIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        console.log(
+                            "Imagen actual:",
+                            currentIndex
+                        )
                     }
                 }
             }

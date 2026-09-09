@@ -1,4 +1,5 @@
 #include "MediaModel.h"
+#include <algorithm>
 
 MediaModel::MediaModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -76,6 +77,62 @@ void MediaModel::clear()
     beginResetModel();
 
     m_items.clear();
+
+    endResetModel();
+}
+
+void MediaModel::sortItems(const QString &field, bool ascending)
+{
+    beginResetModel();
+
+    std::sort(
+        m_items.begin(),
+        m_items.end(),
+        [&field, ascending](
+            const MediaItem &a,
+            const MediaItem &b
+        )
+        {
+            int result = 0;
+
+            if (field == "name") {
+                result =
+                    QString::localeAwareCompare(
+                        a.fileName,
+                        b.fileName
+                    );
+            }
+            else if (field == "path") {
+                result = 
+                    QString::localeAwareCompare(
+                        a.path,
+                        b.path
+                    );
+            }
+            else if (field == "size") {
+                if (a.size < b.size)
+                    result = -1;
+                else if (a.size > b.size)
+                    result = 1;
+            }
+            else if (field == "modified") {
+                if (a.modified < b.modified)
+                    result = -1;
+                else if (a.modified > b.modified)
+                    result = 1;
+            }
+            else if (field == "created") {
+                if (a.created < b.created)
+                    result = -1;
+                else if (a.created > b.created)
+                    result = 1;
+            }
+
+            return ascending
+                ? result < 0
+                : result > 0;
+        }
+    );
 
     endResetModel();
 }
