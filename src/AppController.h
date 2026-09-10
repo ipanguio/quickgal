@@ -39,6 +39,11 @@ public:
         bool ascending
     );
 
+    Q_INVOKABLE void sortAlbums(
+        const QString &field,
+        bool ascending
+    );
+
 signals:
     void showHiddenAlbumsChanged();
 

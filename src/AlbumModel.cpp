@@ -93,6 +93,65 @@ void AlbumModel::setAlbums(const QVector<Album> &albums)
     endResetModel();
 }
 
+void AlbumModel::sortAlbums(
+    const QString &field,
+    bool ascending
+)
+{
+    beginResetModel();
+
+    std::sort(
+        m_albums.begin(),
+        m_albums.end(),
+        [&field, ascending](
+            const Album &a,
+            const Album &b
+        )
+        {
+            int result = 0;
+
+            if (field == "name") {
+                result =
+                    QString::localeAwareCompare(
+                        a.name,
+                        b.name
+                    );
+            }
+            else if (field == "path") {
+                result =
+                    QString::localeAwareCompare(
+                        a.path,
+                        b.path
+                    );
+            }
+            else if (field == "size") {
+                if (a.size < b.size)
+                    result = -1;
+                else if (a.size > b.size)
+                    result = 1;
+            }
+            else if (field == "modified") {
+                if (a.modified < b.modified)
+                    result = -1;
+                else if (a.modified > b.modified)
+                    result = 1;
+            }
+            else if (field == "created") {
+                if (a.created < b.created)
+                    result = -1;
+                else if (a.created > b.created)
+                    result = 1;
+            }
+
+            return ascending
+                ? result < 0
+                : result > 0;
+        }
+    );
+
+    endResetModel();
+}
+
 const QVector<Album> &AlbumModel::albums() const
 {
     return m_albums;

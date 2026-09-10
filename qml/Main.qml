@@ -38,6 +38,20 @@ Window {
                 header: PageHeader {
                     id: pageHeader
                     title: "QuickGal"
+
+                    trailingActionBar.actions: [
+                        Action {
+                            text: i18n.tr("Opciones")
+                            iconName: "navigation-menu"
+
+                            onTriggered: {
+                                PopupUtils.open(
+                                    albumsMenuComponent,
+                                    pageHeader
+                                )
+                            }
+                        }
+                    ]
                 }
 
                 Row {
@@ -172,6 +186,37 @@ Window {
                         }
                     }
                 }
+
+                Component {
+                    id: albumsMenuComponent
+
+                    Popover {
+                        id: albumsMenu
+
+                        Column {
+                            width: units.gu(25)
+
+                            ListItem {
+                                height: units.gu(6)
+
+                                ListItemLayout {
+                                    title.text: i18n.tr("Ordenar por")
+                                }
+
+                                onClicked: {
+                                    PopupUtils.close(albumsMenu)
+                                    
+                                    pageStack.push(
+                                        sortPageComponent,
+                                        {
+                                            target: "albums"
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -281,7 +326,10 @@ Window {
                                     PopupUtils.close(albumMenu)
 
                                     pageStack.push(
-                                        sortPageComponent
+                                        sortPageComponent,
+                                        {
+                                            target: "media"
+                                        }
                                     )
                                 }
                             }
@@ -297,6 +345,7 @@ Window {
             Page {
                 id: sortPage
 
+                property string target: "media"
                 property string sortField: "name"
                 property bool ascending: true
 
@@ -372,10 +421,18 @@ Window {
                                     sortPage.sortField = "created"
                                     break
                                 }
-                                appController.sortMedia(
-                                    sortPage.sortField,
-                                    sortPage.ascending
-                                )
+                                
+                                if (sortPage.target === "albums") {
+                                    appController.sortAlbums(
+                                        sortPage.sortField,
+                                        sortPage.ascending
+                                    )
+                                } else {
+                                    appController.sortMedia(
+                                        sortPage.sortField,
+                                        sortPage.ascending
+                                    )
+                                }
                             }
                         }
 
@@ -400,10 +457,17 @@ Window {
                                 sortPage.ascending =
                                     selectedIndex === 0
 
-                                appController.sortMedia(
+                                if (sortPage.target === "albums") {
+                                    appController.sortAlbums(
+                                        sortPage.sortField,
+                                        sortPage.ascending
+                                    )
+                                } else {
+                                    appController.sortMedia(
                                     sortPage.sortField,
                                     sortPage.ascending
-                                )
+                                    )
+                                }
                             }
                         }
                     }

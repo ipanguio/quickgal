@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QString>
 #include <QVector>
+#include <QDateTime>
 
 struct Album
 {
@@ -11,6 +12,9 @@ struct Album
     QString path;
     QString coverPath;
     int count = 0;
+    qint64 size = 0;
+    QDateTime modified;
+    QDateTime created;
 };
 
 class AlbumModel : public QAbstractListModel
@@ -41,6 +45,11 @@ public:
     void addAlbum(const Album &album);
 
     void setAlbums(const QVector<Album> &albums);
+
+    void sortAlbums(
+        const QString &field,
+        bool ascending
+    );
 
     const QVector<Album> &albums() const;
 

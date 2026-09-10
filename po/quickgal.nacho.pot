@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 20:47+0000\n"
+"POT-Creation-Date: 2026-09-10 11:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,55 +17,55 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../qml/Main.qml:58
-msgid "Mostrar álbumes ocultos"
-msgstr ""
-
-#: ../qml/Main.qml:148
-msgid "%1 elementos"
-msgstr ""
-
-#: ../qml/Main.qml:192
+#: ../qml/Main.qml:44 ../qml/Main.qml:237
 msgid "Opciones"
 msgstr ""
 
-#: ../qml/Main.qml:277 ../qml/Main.qml:305
+#: ../qml/Main.qml:72
+msgid "Mostrar álbumes ocultos"
+msgstr ""
+
+#: ../qml/Main.qml:162
+msgid "%1 elementos"
+msgstr ""
+
+#: ../qml/Main.qml:203 ../qml/Main.qml:322 ../qml/Main.qml:354
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml:338
+#: ../qml/Main.qml:387
 msgid "Criterio"
 msgstr ""
 
-#: ../qml/Main.qml:348
+#: ../qml/Main.qml:397
 msgid "Nombre"
 msgstr ""
 
-#: ../qml/Main.qml:349
+#: ../qml/Main.qml:398
 msgid "Ruta"
 msgstr ""
 
-#: ../qml/Main.qml:350
+#: ../qml/Main.qml:399
 msgid "Tamaño"
 msgstr ""
 
-#: ../qml/Main.qml:351
+#: ../qml/Main.qml:400
 msgid "Fecha de modificación"
 msgstr ""
 
-#: ../qml/Main.qml:352
+#: ../qml/Main.qml:401
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml:383
+#: ../qml/Main.qml:440
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml:393
+#: ../qml/Main.qml:450
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml:394
+#: ../qml/Main.qml:451
 msgid "Descendente"
 msgstr ""
 

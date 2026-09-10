@@ -79,3 +79,19 @@ void AppController::sortMedia(
         ascending
     );
 }
+void AppController::sortAlbums(
+    const QString &field,
+    bool ascending
+)
+{
+    qWarning()
+        << "Ordenando albumes por:"
+        << field
+        << "ascendente:"
+        << ascending;
+
+    m_albumModel->sortAlbums(
+        field,
+        ascending
+    );
+}
