@@ -159,7 +159,11 @@ Window {
                                 }
 
                                 Label {
-                                    text: i18n.tr("%1 elementos", count)
+                                    text: i18n.tr(
+                                        "%1 elemento",
+                                        "%1 elementos",
+                                        count
+                                        ).arg(count)
                                 }
                             }
 
@@ -485,10 +489,12 @@ Window {
 
                 header: PageHeader {
                     id: imageHeader
-                    title: imageViewer.count > 0 
-                        ? (imageViewer.currentIndex +1)
-                        + "/"
-                        + imageViewer.count
+                    title: imageViewer.count > 0 && imageViewer.currentItem
+                        ? (imageViewer.currentIndex + 1)
+                          + "/"
+                          + imageViewer.count
+                          + " - "
+                          + imageViewer.currentItem.mediaFileName
                         :""
                 }
 
@@ -523,6 +529,8 @@ Window {
                     delegate: Rectangle {
                         width: imageViewer.width
                         height: imageViewer.height
+
+                        property string mediaFileName: fileName
 
                         color: "black"
 

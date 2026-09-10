@@ -216,7 +216,7 @@ QVector<MediaItem> MediaScanner::scanDirectory(
     QFileInfoList files =
         directory.entryInfoList(
             QDir::Files | QDir::NoDotAndDotDot,
-            QDir::Time
+            QDir::Name | QDir::IgnoreCase
         );
 
     for (const QFileInfo &fileInfo : files) {
