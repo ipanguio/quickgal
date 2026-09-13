@@ -17,10 +17,26 @@ set(FULL_PROJECT_NAME "quickgal.nacho")
 set(DATA_DIR /)
 set(DESKTOP_FILE_NAME ${PROJECT_NAME}.desktop)
 
+# Select QML components depending on Ubuntu Touch framework
+if("$ENV{CLICK_FRAMEWORK}" MATCHES "16\\.04")
+    set(QML_COMPONENTS_IMPORT "import Ubuntu.Components 1.3")
+    set(QML_POPUPS_IMPORT "import Ubuntu.Components.Popups 1.3")
+else()
+    set(QML_COMPONENTS_IMPORT "import Lomiri.Components 1.3")
+    set(QML_POPUPS_IMPORT "import Lomiri.Components.Popups 1.3")
+endif()
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/qml/Main.qml.in
+    ${CMAKE_CURRENT_BINARY_DIR}/qml/Main.qml
+    @ONLY
+)
+
 # Translations
 file(GLOB_RECURSE I18N_SRC_FILES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/po
     qml/*.qml
+    qml/*.qml.in
     qml/*.js
 )
 
@@ -48,7 +64,10 @@ configure_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/manifest.json DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES ${PROJECT_NAME}.apparmor DESTINATION ${DATA_DIR})
 install(DIRECTORY assets DESTINATION ${DATA_DIR})
-install(DIRECTORY qml DESTINATION ${DATA_DIR})
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/qml/Main.qml
+    DESTINATION qml
+)
 
 add_custom_target(${DESKTOP_FILE_NAME} ALL
     COMMENT "Merging translations into ${DESKTOP_FILE_NAME}..."

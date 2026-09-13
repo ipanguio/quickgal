@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QMap>
 #include <algorithm>
+#include <QDebug>
 
 MediaScanner::MediaScanner(QObject *parent)
     : QObject(parent),
@@ -131,37 +132,36 @@ bool MediaScanner::hasNoMedia(const QString &directoryPath) const
     );
 }
 
-QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
+QVector<Album> MediaScanner::scanAlbums(
+    const QString &rootPath
+)
 {
     QVector<Album> albums;
 
-    QDir rootDir(rootPath);
-
-    if (!rootDir.exists()) {
-        return albums;
-    }
-
     QStringList directories;
-    directories.append(rootPath);
+    // Root 
+    directories << rootPath;
 
-    QDirIterator dirIterator(
+    // All directories and sub-directories
+    QDirIterator iterator(
         rootPath,
         QDir::Dirs | QDir::NoDotAndDotDot,
         QDirIterator::Subdirectories
     );
 
-    while (dirIterator.hasNext()) {
-        directories.append(dirIterator.next());
+    while (iterator.hasNext()) {
+        directories << iterator.next();
     }
 
-    for (const QString &directoryPath : directories) {
+        for (const QString &directoryPath : directories) {
 
         /*
          * If the directory is hidden by a .nomedia file
          * we skip it and its subdirectories
          */
 
-        if (!m_showNoMedia && hasNoMedia(directoryPath)) {
+        if (!m_showNoMedia &&
+            isInsideNoMediaTree(directoryPath, rootPath)) {
             continue;
         }
 
@@ -170,7 +170,7 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
         QFileInfoList files =
             directory.entryInfoList(
                 QDir::Files | QDir::NoDotAndDotDot,
-                QDir::Time
+                QDir::Name | QDir::IgnoreCase
             );
         
         Album album;
@@ -178,6 +178,16 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
         album.name = directory.dirName();
         album.path = directoryPath;
         album.count = 0;
+        album.size = 0;
+
+        QFileInfo directoryInfo(directoryPath);
+
+        album.modified = directoryInfo.lastModified();
+        album.created = directoryInfo.birthTime();
+
+        if (!album.created.isValid()) {
+            album.created = album.modified;
+        }
 
         for (const QFileInfo &fileInfo : files) {
             const QString filePath = fileInfo.absoluteFilePath();
@@ -191,6 +201,7 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
             }
 
             ++album.count;
+            album.size += fileInfo.size();
         }
 
         if (album.count > 0) {
@@ -199,6 +210,34 @@ QVector<Album> MediaScanner::scanAlbums(const QString &rootPath)
     }
 
     return albums;
+}
+
+bool MediaScanner::isInsideNoMediaTree(
+    const QString &directoryPath,
+    const QString &rootPath
+) const
+{
+    QString currentPath = directoryPath;
+
+    while (currentPath.startsWith(rootPath)) {
+        if (hasNoMedia(currentPath)) {
+            return true;
+        }
+
+        if (currentPath == rootPath) {
+            break;
+        }
+
+        QDir currentDir(currentPath);
+
+        if (!currentDir.cdUp()) {
+            break;
+        }
+
+        currentPath = currentDir.absolutePath();
+    }
+
+    return false;
 }
 
 QVector<MediaItem> MediaScanner::scanDirectory(

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-10 15:53+0000\n"
+"POT-Creation-Date: 2026-09-13 21:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,58 +18,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../qml/Main.qml:44 ../qml/Main.qml:241
+#: ../qml/Main.qml.in:44 ../qml/Main.qml.in:223 ../qml/Main_lomiri.qml:44
+#: ../qml/Main_lomiri.qml:241 ../qml/Main_xenial.qml:44
+#: ../qml/Main_xenial.qml:241
 msgid "Opciones"
 msgstr ""
 
-#: ../qml/Main.qml:72
-msgid "Mostrar álbumes ocultos"
-msgstr ""
-
-#: ../qml/Main.qml:163
+#: ../qml/Main.qml.in:126 ../qml/Main_lomiri.qml:163 ../qml/Main_xenial.qml:163
 msgid "%1 elemento"
 msgid_plural "%1 elementos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../qml/Main.qml:207 ../qml/Main.qml:326 ../qml/Main.qml:358
+#: ../qml/Main.qml.in:170 ../qml/Main.qml.in:308 ../qml/Main.qml.in:340
+#: ../qml/Main_lomiri.qml:207 ../qml/Main_lomiri.qml:326
+#: ../qml/Main_lomiri.qml:358 ../qml/Main_xenial.qml:207
+#: ../qml/Main_xenial.qml:326 ../qml/Main_xenial.qml:358
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml:391
+#: ../qml/Main.qml.in:189
+msgid "Mostrar ocultos"
+msgstr ""
+
+#: ../qml/Main.qml.in:373 ../qml/Main_lomiri.qml:391 ../qml/Main_xenial.qml:391
 msgid "Criterio"
 msgstr ""
 
-#: ../qml/Main.qml:401
+#: ../qml/Main.qml.in:383 ../qml/Main_lomiri.qml:401 ../qml/Main_xenial.qml:401
 msgid "Nombre"
 msgstr ""
 
-#: ../qml/Main.qml:402
+#: ../qml/Main.qml.in:384 ../qml/Main_lomiri.qml:402 ../qml/Main_xenial.qml:402
 msgid "Ruta"
 msgstr ""
 
-#: ../qml/Main.qml:403
+#: ../qml/Main.qml.in:385 ../qml/Main_lomiri.qml:403 ../qml/Main_xenial.qml:403
 msgid "Tamaño"
 msgstr ""
 
-#: ../qml/Main.qml:404
+#: ../qml/Main.qml.in:386 ../qml/Main_lomiri.qml:404 ../qml/Main_xenial.qml:404
 msgid "Fecha de modificación"
 msgstr ""
 
-#: ../qml/Main.qml:405
+#: ../qml/Main.qml.in:387 ../qml/Main_lomiri.qml:405 ../qml/Main_xenial.qml:405
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml:444
+#: ../qml/Main.qml.in:426 ../qml/Main_lomiri.qml:444 ../qml/Main_xenial.qml:444
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml:454
+#: ../qml/Main.qml.in:436 ../qml/Main_lomiri.qml:454 ../qml/Main_xenial.qml:454
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml:455
+#: ../qml/Main.qml.in:437 ../qml/Main_lomiri.qml:455 ../qml/Main_xenial.qml:455
 msgid "Descendente"
+msgstr ""
+
+#: ../qml/Main_lomiri.qml:72 ../qml/Main_xenial.qml:72
+msgid "Mostrar álbumes ocultos"
 msgstr ""
 
 #: quickgal.desktop.in.h:1

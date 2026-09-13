@@ -1,7 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
-import Lomiri.Components 1.3
-import Lomiri.Components.Popups 1.3
+@QML_COMPONENTS_IMPORT@
+@QML_POPUPS_IMPORT@
 
 Window {
     id: window
@@ -54,48 +54,11 @@ Window {
                     ]
                 }
 
-                Row {
-                    id: optionsRow
-
-                    anchors {
-                        top: pageHeader.bottom
-                        left: parent.left
-                        right: parent.right
-                        leftMargin: units.gu(2)
-                        rightMargin: units.gu(2)
-                        }
-
-                    height: units.gu(7)
-                    spacing: units.gu(2)
-
-                    Label {
-                        text: i18n.tr("Mostrar álbumes ocultos")
-                        anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                    Switch {
-                        id: hiddenSwitch
-
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        checked: appController.showHiddenAlbums
-
-                        onCheckedChanged: {
-                            console.log(
-                                "Switch ocultos:",
-                                checked
-                            )
-
-                            appController.showHiddenAlbums = checked
-                        }
-                    }
-                }
-
                 GridView {
                     id: albumGrid
 
                     anchors {
-                        top: optionsRow.bottom
+                        top: pageHeader.bottom
                         left: parent.left
                         right: parent.right
                         bottom: parent.bottom
@@ -216,6 +179,25 @@ Window {
                                             target: "albums"
                                         }
                                     )
+                                }
+                            }
+
+                            ListItem {
+                                height: units.gu(6)
+
+                                ListItemLayout {
+                                    title.text: i18n.tr("Mostrar ocultos")
+
+                                    CheckBox {
+                                        id: hiddenAlbumsCheckBox
+
+                                        SlotsLayout.position: SlotsLayout.Trailing
+                                        checked: appController.showHiddenAlbums
+
+                                        onClicked: {
+                                            appController.showHiddenAlbums = checked
+                                        }
+                                    }
                                 }
                             }
                         }

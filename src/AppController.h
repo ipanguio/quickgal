@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #include "MediaScanner.h"
 #include "AlbumModel.h"
@@ -54,8 +55,11 @@ private:
 
     bool m_showHiddenAlbums = false;
 
+    QStringList mediaRoots() const;
+
     QString m_rootPath =
         "/home/phablet/Pictures";
 };
+
 
 #endif

@@ -1,3 +1,6 @@
+#include <QDir>
+#include <QFileInfo>
+#include <QStringList>
 #include <QDebug>
 #include "AppController.h"
 
@@ -20,35 +23,45 @@ bool AppController::showHiddenAlbums() const
 
 void AppController::setShowHiddenAlbums(bool show)
 {
-    qWarning() << "setShowHiddenAlbums:" << show;
-
     if (m_showHiddenAlbums == show) {
         return;
     }
 
     m_showHiddenAlbums = show;
 
-    m_scanner.setShowNoMedia(show);
-
     emit showHiddenAlbumsChanged();
 
+    m_scanner.setShowNoMedia(show);
+
     refreshAlbums();
+
+    qWarning()
+    << "Mostrar albumes ocultos cambiado a:"
+    << show;
 }
 
 void AppController::refreshAlbums()
 {
-    qWarning() << "Refrescando albumes";
-    qWarning() << "Mostrar .nomedia:"
-               << m_showHiddenAlbums;
-    
-               QVector<Album> albums =
-        m_scanner.scanAlbums(m_rootPath);
+    QVector<Album> allAlbums;
+
+        const QStringList roots = mediaRoots();
+        for (const QString &rootPath : roots) {
+            qWarning()
+                << "Escaneando raiz:"
+                << rootPath;
+
+            QVector<Album> albums = m_scanner.scanAlbums(rootPath);
+
+            allAlbums += albums;
+        }
 
         qWarning() <<"Albumes encontrados:"
-                   << albums.size();
+                   << allAlbums.size();
 
-    m_albumModel->setAlbums(albums);
+
+    m_albumModel->setAlbums(allAlbums);
 }
+
 void AppController::openAlbum(
     const QString &path
 )
@@ -94,4 +107,35 @@ void AppController::sortAlbums(
         field,
         ascending
     );
+}
+QStringList AppController::mediaRoots() const
+{
+    QStringList roots;
+
+    const QString internalPictures =
+        "/home/phablet/Pictures";
+
+    if (QDir(internalPictures).exists()) {
+        roots << internalPictures;
+    }
+
+    QDir mediaDir("/media/phablet");
+
+    const QFileInfoList devices =
+        mediaDir.entryInfoList(
+            QDir::Dirs | QDir::NoDotAndDotDot
+        );
+
+    for (const QFileInfo &deviceInfo : devices) {
+
+        const QString picturesPath =
+            deviceInfo.absoluteFilePath()
+            + "/Pictures";
+
+        if (QDir(picturesPath).exists()) {
+            roots << picturesPath;
+        }
+    }
+
+    return roots;
 }

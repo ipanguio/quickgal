@@ -6,3 +6,5 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
+/qml/Main_lomiri.qml
+/qml/Main_xenial.qml
