@@ -57,6 +57,9 @@ Window {
                 GridView {
                     id: albumGrid
 
+                    property real targetCelWidth: units.gu(18)
+                    property int columns: Math.max(2, Math.floor(width / targetCelWidth))
+
                     anchors {
                         top: pageHeader.bottom
                         left: parent.left
@@ -66,8 +69,8 @@ Window {
 
                     clip: true
 
-                    cellWidth: width / 2
-                    cellHeight: units.gu(26)
+                    cellWidth: width / columns
+                    cellHeight: cellWidth + units.gu(6)
 
                     model: albumModel
 
@@ -93,7 +96,7 @@ Window {
 
                                 Rectangle {
                                     width: parent.width
-                                    height: units.gu(18)
+                                    height: width
 
                                     color: "#cccccc"
 
@@ -239,6 +242,13 @@ Window {
                 GridView {
                     id: mediaGrid
 
+                    property real targetCellWidth: units.gu(14)
+                    property int columns: 
+                        Math.max(3, Math.floor(width / targetCellWidth))
+
+                    cellWidth: width / columns
+                    cellHeight: cellWidth
+
                     anchors {
                         top: albumHeader.bottom
                         left: parent.left
@@ -248,38 +258,51 @@ Window {
 
                     model: mediaModel
 
-                    cellWidth: width / 3
-                    cellHeight: cellWidth
-
                     delegate: Item {
+                        id: mediaDelegate
+
                         width: mediaGrid.cellWidth
                         height: mediaGrid.cellHeight
 
-                        Image {
+                        property string mediaPath: path
+                        property string thumbnailSource: ""
+
+                        Component.onCompleted: {
+                            thumbnailSource = thumbnailProvider.requestThumbnail(mediaPath)
+                        }
+
+                        Connections {
+                            target: thumbnailProvider
+
+                            onThumbnailReady: {
+                                if (imagePath === mediaDelegate.mediaPath) {
+                                    mediaDelegate.thumbnailSource = thumbnailUrl
+                                }
+                            }
+                        }
+
+                        Rectangle {
                             anchors {
-                                fill: parent
-                                margins: units.gu(0.25)
+                                fill : parent
+                                margins: units.gu(0.25)                                
                             }
 
-                            source: "file://" + path
-                            fillMode: Image.PreserveAspectCrop
+                            color: "#cccccc"
 
-                            sourceSize.width: width
-                            sourceSize.height: height
-
-                            asynchronous: true
-                            cache: true
+                            Image {
+                                anchors.fill: parent
+                                source: mediaDelegate.thumbnailSource
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous : true
+                                cache: true
+                            }
                         }
 
                         MouseArea {
                             anchors.fill: parent
 
                             onClicked: {
-                                console.log("Abriendo imagen:",
-                                    path,
-                                    "índice:",
-                                    index
-                                )
+                                console.log("Abriendo imagen: ",path, " índice:", idex)
 
                                 pageStack.push(
                                     imagePageComponent,
@@ -288,6 +311,40 @@ Window {
                                     }
                                 )
                             }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    id: thumbnailBusyMessage
+
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        bottom: parent.bottom
+                        bottomMargin: units.gu(3)
+                    }
+
+                    width: busyRow.width + units.gu(4)
+                    height: units.gu(6)
+                    radius: units.gu(1)
+                    color: theme.palette.normal.background
+                    visible: thumbnailProvider.busy
+                    z: 100
+
+                    Row {
+                        id: busyRow
+
+                        anchors.centerIn: parent
+                        spacing: units.gu(1)
+
+                        ActivityIndicator {
+                            running: thumbnailProvider.busy
+                        }
+
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            text: i18n.tr("Generando miniaturas…")
                         }
                     }
                 }

@@ -8,6 +8,7 @@
 #include "AlbumModel.h"
 #include "AppController.h"
 #include "MediaModel.h"
+#include "ThumbnailProvider.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,9 @@ int main(int argc, char *argv[])
         &albumModel,
         &mediaModel
     );
+
+    ThumbnailProvider thumbnailProvider;
+    
     appController.refreshAlbums();
     
     QQmlApplicationEngine engine;
@@ -37,6 +41,11 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(
         "appController",
         &appController
+    );
+
+    engine.rootContext()->setContextProperty(
+        "thumbnailProvider",
+        &thumbnailProvider
     );
 
     QString qmlPath =

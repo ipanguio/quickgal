@@ -104,6 +104,7 @@ add_executable(${PROJECT_NAME}
     src/AlbumModel.cpp
     src/MediaModel.cpp
     src/AppController.cpp
+    src/ThumbnailProvider.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
