@@ -302,7 +302,7 @@ Window {
                             anchors.fill: parent
 
                             onClicked: {
-                                console.log("Abriendo imagen: ",path, " índice:", idex)
+                                console.log("Abriendo imagen: ",path, " índice:", index)
 
                                 pageStack.push(
                                     imagePageComponent,
