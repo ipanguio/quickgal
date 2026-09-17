@@ -525,9 +525,13 @@ Window {
                 id: imagePage
 
                 property int initialIndex: 0
+                property bool fullScreen: false
 
                 header: PageHeader {
                     id: imageHeader
+                    
+                    visible: !imagePage.fullScreen
+
                     title: imageViewer.count > 0 && imageViewer.currentItem
                         ? (imageViewer.currentIndex + 1)
                           + "/"
@@ -540,12 +544,19 @@ Window {
                 ListView {
                     id: imageViewer
 
+                    interactive : false
+
                     anchors {
-                        top: imageHeader.bottom
+                        top: parent.top
                         left: parent.left
                         right: parent.right
                         bottom: parent.bottom
                     }
+
+                    anchors.topMargin:
+                        imagePage.fullScreen
+                            ? 0
+                            : imageHeader.height
 
                     orientation: ListView.Horizontal
 
@@ -555,8 +566,7 @@ Window {
 
                     snapMode: ListView.SnapOneItem
 
-                    highlightRangeMode:
-                        ListView.StrictlyEnforceRange
+                    highlightRangeMode: ListView.StrictlyEnforceRange
 
                     preferredHighlightBegin: 0
                     preferredHighlightEnd: 0
@@ -566,6 +576,9 @@ Window {
                     clip: true
 
                     delegate: Rectangle {
+
+                        id: imageDelegate
+
                         width: imageViewer.width
                         height: imageViewer.height
 
@@ -582,12 +595,13 @@ Window {
                             property real zoom: 1.0
                             property real minZoom: 1.0
                             property real maxZoom: 5.0
-                            property bool pinching: false
-
+                            
                             contentWidth: width * zoom
                             contentHeight: height * zoom
 
-                            interactive: zoom > 1.0 && !pinching
+                            // Gestures are defined by us
+                            interactive: false
+
                             boundsBehavior: Flickable.StopAtBounds
 
                             Item {
@@ -611,139 +625,241 @@ Window {
                                 }
                             }
 
+                            MultiPointTouchArea {
+                                id: imageTouchArea
+
+                                anchors.fill: parent
+
+                                minimumTouchPoints: 1
+                                maximumTouchPoints: 2
+
+                                property double lastTapTime: 0
+                                property int doubleTapInterval: 400
+                                property real pressX: 0
+                                property real pressY: 0
+                                property real lastX: 0
+                                property real lastY: 0
+                                property bool moved: false
+                                property bool pinching: false
+                                property real pinchStartDistance: 0
+                                property real pinchStartZoom: 1.0
+                                property real imagePointX: 0
+                                property real imagePointY: 0
+
+                                touchPoints: [
+                                    TouchPoint {
+                                        id: touch1
+                                    },
+                                    TouchPoint {
+                                        id: touch2
+                                    }
+                                ]
+
+                                /*
+                                 * Distance between the two fingers.
+                                 */
+                                function fingerDistance()
+                                 {
+                                    var dx = touch2.x - touch1.x
+                                    var dy = touch2.y - touch1.y
+
+                                    return Math.sqrt(dx * dx + dy * dy)
+                                 }
+
+                                 /*
+                                  * Centre point between both fingers.
+                                  */
+                                function centerX()
+                                {
+                                    return (touch1.x + touch2.x) / 2
+                                }
+                                function centerY()
+                                {
+                                    return (touch1.y + touch2.y) / 2
+                                }
+
+                                onPressed: {
+                                    console.log("Pressed")
+                                    /*
+                                     *Two fingers -> start pinch
+                                     */
+                                    if (touch1.pressed && touch2.pressed) {
+                                        pinching = true
+                                        moved = true
+                                        pinchStartZoom = imageFlickable.zoom
+                                        pinchStartDistance = fingerDistance()
+
+                                        var cx = centerX()
+                                        var cy = centerY()
+
+                                        /*
+                                         * Image point below the centre
+                                         * of the pinch gesture
+                                         */
+                                        imagePointX = (imageFlickable.contentX + cx) / pinchStartZoom
+                                        imagePointY = (imageFlickable.contentY + cy) / pinchStartZoom
+
+                                        return
+                                    }
+
+                                    /*
+                                     * One finger-
+                                     */
+                                    pressX = touch1.x
+                                    pressY = touch1.y
+                                    lastX = touch1.x
+                                    lastY = touch1.y
+                                    moved = false
+                                }
+
+                                onUpdated: {
+                                    console.log("Updated")
+                                    /*
+                                     * Pinch
+                                     */
+                                    if (touch1.pressed && touch2.pressed) {
+                                        if (!pinching){
+                                            pinching = true
+                                            moved = true
+                                            pinchStartZoom = imageFlickable.zoom
+                                            pinchStartDistance = fingerDistance()
+                                            var startCX = centerX()
+                                            var startCY = centerY()
+
+                                            imagePointX = (imageFlickable.contentX + startCX) / pinchStartZoom
+                                            imagePointY = (imageFlickable.contentY + startCY) / pinchStartZoom
+                                        }
+                                        var distance = fingerDistance()
+                                        if (pinchStartDistance <= 0) {
+                                            return
+                                        }
+                                        var newZoom = pinchStartZoom * distance / pinchStartDistance
+                                        if (newZoom < imageFlickable.minZoom) {
+                                            newZoom = imageFlickable.minZoom
+                                        }
+                                        if (newZoom > imageFlickable.maxZoom) {
+                                            newZoom = imageFlickable.maxZoom
+                                        }
+                                        var cx = centerX()
+                                        var cy = centerY()
+                                        imageFlickable.zoom = newZoom
+
+                                        /*
+                                         * Keep the same image point under the fingers
+                                         */
+                                        var newContentX = imagePointX * newZoom - cx
+                                        var newContentY = imagePointY * newZoom - cy
+                                        var maxX = Math.max(0, imageFlickable.contentWidth - imageFlickable.width)
+                                        var maxY = Math.max(0, imageFlickable.contentHeight - imageFlickable.height)
+                                        imageFlickable.contentX = Math.max(0, Math.min(newContentX, maxX))
+                                        imageFlickable.contentY = Math.max(0, Math.min(newContentY, maxY))
+
+                                        return
+                                    }
+
+                                    /*
+                                     * ONE FINGER
+                                     */
+                                    if (touch1.pressed) {
+                                        var dx = touch1.x - lastX
+                                        var dy = touch1.y - lastY
+                                        /*
+                                         * When zoomed, one finger moves around the image.
+                                         */
+                                        if (imageFlickable.zoom > 1.0) {
+                                            var maxPanX = Math.max(0, imageFlickable.contentWidth - imageFlickable.width)
+                                            var maxPanY = Math.max(0, imageFlickable.contentHeight - imageFlickable.height)
+
+                                            imageFlickable.contentX = Math.max(0, Math.min(imageFlickable.contentX - dx, maxPanX))
+                                            imageFlickable.contentY = Math.max(0, Math.min(imageFlickable.contentY - dy, maxPanY))
+                                        }
+                                    }
+                                    if (Math.abs(touch1.x - pressX) > units.gu(1) || Math.abs(touch1.y  - pressY) > units.gu(1)) {
+                                        moved = true
+                                    }
+                                    lastX = touch1.x
+                                    lastY = touch1.y
+                                }
+
+                                onTouchUpdated: {
+                                    /*
+                                     * Let's wait until no finger is touching the screen
+                                     */
+                                    if (touch1.pressed || touch2.pressed) {
+                                        return
+                                    }
+                                
+                                    /*
+                                     * If we arrive from a pinch, only clear the state.
+                                     */
+                                    if (pinching) {
+                                        pinching = false
+                                        if (imageFlickable.zoom <= imageFlickable.minZoom) {
+                                            imageFlickable.zoom = imageFlickable.minZoom
+                                            imageFlickable.contentX = 0
+                                            imageFlickable.contentY = 0
+                                        }
+                                        moved = false
+                                        return
+                                    }
+                                    var deltaX = lastX - pressX
+                                    var deltaY = lastY - pressY
+
+                                    /*
+                                     * Horizontal swipe with normal zoom.
+                                     */
+                                    if (imageFlickable.zoom <= 1.0 && Math.abs(deltaX) > units.gu(4) && Math.abs(deltaX) > Math.abs(deltaY)) {
+                                        var newIndex = imageViewer.currentIndex
+                                        if (deltaX < 0) {
+                                            newIndex ++
+                                        } else {
+                                            newIndex --
+                                        }
+                                        newIndex = Math.max(0, Math.min(newIndex, imageViewer.count - 1))
+                                        if (newIndex !== imageViewer.currentIndex) {
+                                            imageViewer.currentIndex = newIndex
+                                            imageViewer.positionViewAtIndex(newIndex, ListView.Beginning)
+                                        }
+                                        moved = false
+                                        return
+                                    }
+                                    /*
+                                    * If there was movement, it wasn't a tap.
+                                    */
+                                    if (moved) {
+                                        moved = false
+                                        return
+                                    }
+                                    /*
+                                     * Detect double tap.
+                                     */
+                                    var now = Date.now()
+                                    var elapsed = now -lastTapTime
+                                    console.log("Tap visor: ", elapsed)
+                                    if (lastTapTime > 0 && elapsed < doubleTapInterval) {
+                                        imagePage.fullScreen = !imagePage.fullScreen
+                                        console.log("Estableciendo imagen completa: ", imagePage.fullScreen)
+                                        lastTapTime = 0
+                                    } else {
+                                        lastTapTime = now
+                                    }
+                                }
+
+                                onCanceled: {
+                                    pinching = false
+                                    moved = false
+                                }
+                            }
+
                             onZoomChanged: {
                                 if (zoom <= minZoom) {
                                     zoom = minZoom
-
                                     contentX = 0
                                     contentY = 0
-
                                     imageViewer.interactive = true
                                 } else {
                                     imageViewer.interactive = false
                                 }
-                            }
-                        }
-
-                        PinchArea {
-                            id: imagePinch
-
-                            anchors.fill: parent
-
-                            property real startZoom: 1.0
-
-                            property real imagePointX: 0.0
-                            property real imagePointY: 0.0
-
-                            property real smoothCenterX: 0.0
-                            property real smoothCenterY: 0.0
-
-                            property real smoothing: 0.20
-
-                            onPinchStarted: {
-                                imageFlickable.pinching = true
-
-                                imageFlickable.cancelFlick()
-
-                                startZoom = imageFlickable.zoom
-
-                                smoothCenterX = pinch.center.x
-                                smoothCenterY = pinch.center.y
-
-                                /*
-                                * Store original point of the image
-                                * placed behind the pinched area.
-                                */
-                                imagePointX =
-                                    (imageFlickable.contentX + smoothCenterX)
-                                    / startZoom
-
-                                imagePointY =
-                                    (imageFlickable.contentY + smoothCenterY)
-                                    / startZoom
-
-                                imageViewer.interactive = false
-                            }
-
-                            onPinchUpdated: {
-                            var newZoom =
-                                startZoom * pinch.scale
-
-                            if (newZoom < imageFlickable.minZoom) {
-                                newZoom = imageFlickable.minZoom
-                            }
-
-                            if (newZoom > imageFlickable.maxZoom) {
-                                newZoom = imageFlickable.maxZoom
-                            }
-
-                            smoothCenterX =
-                                smoothCenterX
-                                + (pinch.center.x - smoothCenterX)
-                                * smoothing
-
-                            smoothCenterY =
-                                smoothCenterY
-                                + (pinch.center.y - smoothCenterY)
-                                * smoothing
-
-                            imageFlickable.zoom = newZoom
-
-                            /*
-                             * Preserve point under finger
-                             * since zoom was started.
-                             */
-                            var newContentX =
-                                imagePointX * newZoom
-                                - smoothCenterX
-
-                            var newContentY =
-                                imagePointY * newZoom
-                                - smoothCenterY
-
-                            var maxX =
-                                Math.max(
-                                0,
-                                imageFlickable.width * newZoom
-                                - imageFlickable.width
-                            )
-
-                            var maxY =
-                                Math.max(
-                                0,
-                                imageFlickable.height * newZoom
-                                - imageFlickable.height
-                            )
-
-                            imageFlickable.contentX =
-                                Math.max(
-                                    0,
-                                    Math.min(newContentX, maxX)
-                                )
-
-                            imageFlickable.contentY =
-                                Math.max(
-                                    0,
-                                    Math.min(newContentY, maxY)
-                                )
-                            }
-
-                            onPinchFinished: {
-                            imageFlickable.pinching = false
-
-                            if (imageFlickable.zoom <=
-                                    imageFlickable.minZoom) {
-
-                                imageFlickable.zoom =
-                                    imageFlickable.minZoom
-
-                                imageFlickable.contentX = 0
-                                imageFlickable.contentY = 0
-
-                                imageViewer.interactive = true
-                            } else {
-                                imageViewer.interactive = false
-                            }
                             }
                         }
                     }           
