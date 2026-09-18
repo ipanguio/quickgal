@@ -47,7 +47,7 @@ void AppController::refreshAlbums()
         const QStringList roots = mediaRoots();
         for (const QString &rootPath : roots) {
             qWarning()
-                << "Escaneando raiz:"
+                << "Escaneando directorio:"
                 << rootPath;
 
             QVector<Album> albums = m_scanner.scanAlbums(rootPath);
@@ -55,11 +55,12 @@ void AppController::refreshAlbums()
             allAlbums += albums;
         }
 
+        m_albumModel->setAlbums(allAlbums);
+
+        m_albumModel->sortAlbums("name", true);
+
         qWarning() <<"Albumes encontrados:"
-                   << allAlbums.size();
-
-
-    m_albumModel->setAlbums(allAlbums);
+            << allAlbums.size();
 }
 
 void AppController::openAlbum(

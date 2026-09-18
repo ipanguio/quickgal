@@ -48,7 +48,7 @@ Window {
                             onTriggered: {
                                 PopupUtils.open(
                                     albumsMenuComponent,
-                                    pageHeader
+                                    pageHeader.trailingActionBar
                                 )
                             }
                         }
@@ -138,12 +138,6 @@ Window {
                                 anchors.fill: parent
 
                                 onClicked: {
-                                    console.log(
-                                        "Abriendo el album:",
-                                        name,
-                                        path
-                                    )
-
                                     appController.openAlbum(path)
 
                                     pageStack.push(
@@ -176,9 +170,10 @@ Window {
 
                                 onClicked: {
                                     PopupUtils.close(albumsMenu)
-                                    
-                                    pageStack.push(
-                                        sortPageComponent,
+
+                                    PopupUtils.open(
+                                        sortPopoverComponent,
+                                        pageHeader.trailingActionBar,
                                         {
                                             target: "albums"
                                         }
@@ -228,13 +223,10 @@ Window {
                             iconName: "navigation-menu"
 
                             onTriggered: {
-                                console.log("Abriendo menú del album")
-
                                 PopupUtils.open(
                                     albumMenuComponent,
-                                    albumHeader
+                                    albumHeader.trailingActionBar
                                 )
-                                
                             }
                         }
                     ]
@@ -344,7 +336,6 @@ Window {
 
                         Label {
                             anchors.verticalCenter: parent.verticalCenter
-
                             text: i18n.tr("Generando miniaturas…")
                         }
                     }
@@ -369,8 +360,9 @@ Window {
                                 onClicked: {
                                     PopupUtils.close(albumMenu)
 
-                                    pageStack.push(
-                                        sortPageComponent,
+                                    PopupUtils.open(
+                                        sortPopoverComponent,
+                                        albumHeader.trailingActionBar,
                                         {
                                             target: "media"
                                         }
@@ -397,52 +389,53 @@ Window {
         }
 
         Component {
-            id: sortPageComponent
+            id: sortPopoverComponent
 
-            Page {
-                id: sortPage
+            Popover {
+                id: sortPopover
 
                 property string target: "media"
                 property string sortField: "name"
                 property bool ascending: true
 
-                header: PageHeader {
-                    id: sortHeader
-                    title: i18n.tr("Ordenar por")
-                }
+                contentWidth: Math.min(
+                    window.width / 2,
+                    units.gu(50)
+                )
 
-                Flickable {
-                    id: sortFlickable
+                Rectangle {
+                    id: sortBackground
 
-                    anchors {
-                        top: sortHeader.bottom
-                        left: parent.left
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
+                    width: sortPopover.contentWidth
+                    height: sortContent.height + units.gu(4)
 
-                    clip: true
+                    color: "#e0e0e0"
+                    radius: units.gu(1)
 
-                    contentWidth: width
-                    contentHeight: sortColumn.height
+                    border.width: units.dp(1)
+                    border.color: "#808080"
 
                     Column {
-                        id: sortColumn
+                        id: sortContent
 
-                        width: sortFlickable.width
+                        width: parent.width - units.gu(4)
 
                         anchors {
-                            left: parent.left
-                            right: parent.right
-                            leftMargin: units.gu(2)
-                            rightMargin: units.gu(2)
+                            top: parent.top
+                            horizontalCenter: parent.horizontalCenter
+                            topMargin: units.gu(2)
                         }
 
-                        spacing: units.gu(2)
+                        spacing: units.gu(1)
 
                         Label {
-                            text: i18n.tr("Criterio")
+                            text: i18n.tr("Ordenar por:")
                             font.bold: true
+                        }
+
+                        Label {
+                            width: parent.width
+                            text: i18n.tr("Criterio")
                         }
 
                         OptionSelector {
@@ -463,44 +456,44 @@ Window {
                             onSelectedIndexChanged: {
                                 switch (selectedIndex) {
                                 case 0:
-                                    sortPage.sortField = "name"
+                                    sortPopover.sortField = "name"
                                     break
                                 case 1:
-                                    sortPage.sortField = "path"
+                                    sortPopover.sortField = "path"
                                     break
                                 case 2:
-                                    sortPage.sortField = "size"
+                                    sortPopover.sortField = "size"
                                     break
                                 case 3:
-                                    sortPage.sortField = "modified"
+                                    sortPopover.sortField = "modified"
                                     break
                                 case 4:
-                                    sortPage.sortField = "created"
+                                    sortPopover.sortField = "created"
                                     break
                                 }
-                                
-                                if (sortPage.target === "albums") {
+
+                                if (sortPopover.target === "albums") {
                                     appController.sortAlbums(
-                                        sortPage.sortField,
-                                        sortPage.ascending
+                                        sortPopover.sortField,
+                                        sortPopover.ascending
                                     )
                                 } else {
                                     appController.sortMedia(
-                                        sortPage.sortField,
-                                        sortPage.ascending
+                                        sortPopover.sortField,
+                                        sortPopover.ascending
                                     )
                                 }
                             }
                         }
 
                         Label {
+                            width: parent.width
                             text: i18n.tr("Dirección")
-                            font.bold: true
                         }
 
                         OptionSelector {
                             id: sortDirectionSelector
-
+        
                             width: parent.width
 
                             model: [
@@ -511,20 +504,29 @@ Window {
                             selectedIndex: 0
 
                             onSelectedIndexChanged: {
-                                sortPage.ascending =
-                                    selectedIndex === 0
+                                sortPopover.ascending =
+                                selectedIndex === 0
 
-                                if (sortPage.target === "albums") {
+                                if (sortPopover.target === "albums") {
                                     appController.sortAlbums(
-                                        sortPage.sortField,
-                                        sortPage.ascending
+                                        sortPopover.sortField,
+                                        sortPopover.ascending
                                     )
                                 } else {
                                     appController.sortMedia(
-                                    sortPage.sortField,
-                                    sortPage.ascending
+                                        sortPopover.sortField,
+                                        sortPopover.ascending
                                     )
                                 }
+                            }
+                        }
+
+                        Button {
+                            width: parent.width
+                            text: i18n.tr("Cerrar")
+
+                            onClicked: {
+                                PopupUtils.close(sortPopover)
                             }
                         }
                     }
@@ -577,14 +579,10 @@ Window {
                     model: mediaModel
 
                     currentIndex: imagePage.initialIndex
-
                     snapMode: ListView.SnapOneItem
-
                     highlightRangeMode: ListView.StrictlyEnforceRange
-
                     preferredHighlightBegin: 0
                     preferredHighlightEnd: 0
-
                     boundsBehavior: Flickable.StopAtBounds
 
                     clip: true
@@ -882,7 +880,6 @@ Window {
                             initialIndex,
                             ListView.Beginning
                         )
-
                         currentIndex = initialIndex
                     }
 

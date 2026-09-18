@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 09:21+0000\n"
+"POT-Creation-Date: 2026-09-18 16:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../qml/Main.qml.in:45 ../qml/Main.qml.in:227
+#: ../qml/Main.qml.in:45 ../qml/Main.qml.in:222
 msgid "Opciones"
 msgstr ""
 
@@ -28,56 +28,64 @@ msgid_plural "%1 elementos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../qml/Main.qml.in:174 ../qml/Main.qml.in:366 ../qml/Main.qml.in:411
+#: ../qml/Main.qml.in:168 ../qml/Main.qml.in:357
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml.in:193
+#: ../qml/Main.qml.in:188
 msgid "Mostrar ocultos"
 msgstr ""
 
-#: ../qml/Main.qml.in:348
+#: ../qml/Main.qml.in:339
 msgid "Generando miniaturas…"
 msgstr ""
 
-#: ../qml/Main.qml.in:385
+#: ../qml/Main.qml.in:377
 msgid "Presentación de diapositivas"
 msgstr ""
 
-#: ../qml/Main.qml.in:444
+#: ../qml/Main.qml.in:432
+msgid "Ordenar por:"
+msgstr ""
+
+#: ../qml/Main.qml.in:438
 msgid "Criterio"
 msgstr ""
 
-#: ../qml/Main.qml.in:454
+#: ../qml/Main.qml.in:447
 msgid "Nombre"
 msgstr ""
 
-#: ../qml/Main.qml.in:455
+#: ../qml/Main.qml.in:448
 msgid "Ruta"
 msgstr ""
 
-#: ../qml/Main.qml.in:456
+#: ../qml/Main.qml.in:449
 msgid "Tamaño"
 msgstr ""
 
-#: ../qml/Main.qml.in:457
+#: ../qml/Main.qml.in:450
 msgid "Fecha de modificación"
 msgstr ""
 
-#: ../qml/Main.qml.in:458
+#: ../qml/Main.qml.in:451
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml.in:497
+#: ../qml/Main.qml.in:491
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml.in:507
+#: ../qml/Main.qml.in:500
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:508
+#: ../qml/Main.qml.in:501
 msgid "Descendente"
+msgstr ""
+
+#: ../qml/Main.qml.in:526
+msgid "Cerrar"
 msgstr ""
 
 #: quickgal.desktop.in.h:1
