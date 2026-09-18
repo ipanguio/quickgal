@@ -1,6 +1,7 @@
 {
     "policy_groups": [
-        "picture_files_read"
+        "picture_files_read",
+        "keep-display-on"
     ],
     "policy_version": "$ENV{APPARMOR_POLICY}"
 }

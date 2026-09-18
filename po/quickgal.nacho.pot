@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-17 15:05+0000\n"
+"POT-Creation-Date: 2026-09-18 09:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,61 +18,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../qml/Main.qml.in:44 ../qml/Main.qml.in:226
+#: ../qml/Main.qml.in:45 ../qml/Main.qml.in:227
 msgid "Opciones"
 msgstr ""
 
-#: ../qml/Main.qml.in:129
+#: ../qml/Main.qml.in:130
 msgid "%1 elemento"
 msgid_plural "%1 elementos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../qml/Main.qml.in:173 ../qml/Main.qml.in:365 ../qml/Main.qml.in:397
+#: ../qml/Main.qml.in:174 ../qml/Main.qml.in:366 ../qml/Main.qml.in:411
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml.in:192
+#: ../qml/Main.qml.in:193
 msgid "Mostrar ocultos"
 msgstr ""
 
-#: ../qml/Main.qml.in:347
+#: ../qml/Main.qml.in:348
 msgid "Generando miniaturas…"
 msgstr ""
 
-#: ../qml/Main.qml.in:430
-msgid "Criterio"
-msgstr ""
-
-#: ../qml/Main.qml.in:440
-msgid "Nombre"
-msgstr ""
-
-#: ../qml/Main.qml.in:441
-msgid "Ruta"
-msgstr ""
-
-#: ../qml/Main.qml.in:442
-msgid "Tamaño"
-msgstr ""
-
-#: ../qml/Main.qml.in:443
-msgid "Fecha de modificación"
+#: ../qml/Main.qml.in:385
+msgid "Presentación de diapositivas"
 msgstr ""
 
 #: ../qml/Main.qml.in:444
+msgid "Criterio"
+msgstr ""
+
+#: ../qml/Main.qml.in:454
+msgid "Nombre"
+msgstr ""
+
+#: ../qml/Main.qml.in:455
+msgid "Ruta"
+msgstr ""
+
+#: ../qml/Main.qml.in:456
+msgid "Tamaño"
+msgstr ""
+
+#: ../qml/Main.qml.in:457
+msgid "Fecha de modificación"
+msgstr ""
+
+#: ../qml/Main.qml.in:458
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml.in:483
+#: ../qml/Main.qml.in:497
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml.in:493
+#: ../qml/Main.qml.in:507
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:494
+#: ../qml/Main.qml.in:508
 msgid "Descendente"
 msgstr ""
 

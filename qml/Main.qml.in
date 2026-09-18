@@ -1,5 +1,6 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
+import QtSystemInfo 5.5
 @QML_COMPONENTS_IMPORT@
 @QML_POPUPS_IMPORT@
 
@@ -374,6 +375,19 @@ Window {
                                             target: "media"
                                         }
                                     )
+                                }
+                            }
+
+                            ListItem {
+                                height: units.gu(6)
+
+                                ListItemLayout{
+                                    title.text : i18n.tr("Presentación de diapositivas")
+                                }
+
+                                onClicked: {
+                                    PopupUtils.close(albumMenu)
+                                    pageStack.push(slideshowPageComponent)
                                 }
                             }
                         }
@@ -838,7 +852,6 @@ Window {
                                     console.log("Tap visor: ", elapsed)
                                     if (lastTapTime > 0 && elapsed < doubleTapInterval) {
                                         imagePage.fullScreen = !imagePage.fullScreen
-                                        console.log("Estableciendo imagen completa: ", imagePage.fullScreen)
                                         lastTapTime = 0
                                     } else {
                                         lastTapTime = now
@@ -878,6 +891,108 @@ Window {
                             "Imagen actual:",
                             currentIndex
                         )
+                    }
+                }
+            }
+        }
+
+        Component {
+            id: slideshowPageComponent
+
+            Page {
+                id: slideshowPage
+                
+                header: PageHeader {
+                    id: slideshowHeader
+                    exposed: false
+                }
+
+                ScreenSaver {
+                    id: screenSaver
+                    screenSaverEnabled: false
+                }
+
+                /*
+                 * Time between pictures, in miliseconds
+                 */
+                property int slideInterval: 3000
+
+                Component.onCompleted: {
+                    slideshowViewer.currentIndex = 0
+                    slideshowViewer.positionViewAtIndex(0, ListView.Beginning)
+                    slideshowTimer.start()
+                }
+
+                Component.onDestruction: {
+                    screenSaver.screenSaverEnabled = true
+                }
+
+                ListView {
+                    id: slideshowViewer
+
+                    anchors.fill: parent
+
+                    orientation: ListView.Horizontal
+                    interactive: false
+
+                    model: mediaModel
+                    currentIndex: 0
+
+                    snapMode: ListView.SnapOneItem
+                    highlightRangeMode: ListView.StrictlyEnforceRange
+
+                    preferredHighlightBegin: 0
+                    preferredHighlightEnd: 0
+
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    clip: true
+
+                    delegate: Rectangle {
+                        width: slideshowViewer.width
+                        height: slideshowViewer.height
+                        color: "black"
+
+                        Image {
+                            anchors.fill: parent
+                            source: "file://" + path
+                            fillMode: Image.PreserveAspectFit
+                            asynchronous: true
+                            cache: true
+                            smooth: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            /*
+                             * Let user to leave slide show by tapping the screen
+                             */
+                            onClicked: {
+                                slideshowTimer.stop()
+                                pageStack.pop()
+                            }
+                        }
+                    }
+                }
+
+                Timer {
+                    id: slideshowTimer
+                    interval: slideshowPage.slideInterval
+                    repeat: true
+                    onTriggered: {
+                        /*
+                         * Let's advance to the next while there are pictures left
+                         */
+                        if(slideshowViewer.currentIndex < slideshowViewer.count -1) {
+                            var nextIndex = slideshowViewer.currentIndex + 1
+                            slideshowViewer.currentIndex = nextIndex
+                            slideshowViewer.positionViewAtIndex(nextIndex, ListView.Beginning)
+                        } else {
+                            /*
+                             * Last pic --> stop slide presentation
+                            */
+                            stop()
+                        }
                     }
                 }
             }
