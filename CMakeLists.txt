@@ -21,9 +21,11 @@ set(DESKTOP_FILE_NAME ${PROJECT_NAME}.desktop)
 if("$ENV{CLICK_FRAMEWORK}" MATCHES "16\\.04")
     set(QML_COMPONENTS_IMPORT "import Ubuntu.Components 1.3")
     set(QML_POPUPS_IMPORT "import Ubuntu.Components.Popups 1.3")
+    set(QML_THUMBNAILER_IMPORT "import Ubuntu.Thumbnailer 0.1")
 else()
     set(QML_COMPONENTS_IMPORT "import Lomiri.Components 1.3")
     set(QML_POPUPS_IMPORT "import Lomiri.Components.Popups 1.3")
+    set(QML_THUMBNAILER_IMPORT "import Lomiri.Thumbnailer 0.1")
 endif()
 
 configure_file(

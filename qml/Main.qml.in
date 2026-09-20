@@ -1,8 +1,8 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtSystemInfo 5.5
-import Ubuntu.Thumbnailer 0.1
 
+@QML_THUMBNAILER_IMPORT@
 @QML_COMPONENTS_IMPORT@
 @QML_POPUPS_IMPORT@
 
