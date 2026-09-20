@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QDebug>
 #include "AppController.h"
+#include <QDebug>
 
 AppController::AppController(
     AlbumModel *albumModel,
@@ -120,6 +121,13 @@ QStringList AppController::mediaRoots() const
         roots << internalPictures;
     }
 
+    const QString internalVideos = 
+        "/home/phablet/Videos";
+
+    if (QDir(internalVideos).exists()) {
+        roots << internalVideos;
+    }
+
     QDir mediaDir("/media/phablet");
 
     const QFileInfoList devices =
@@ -135,6 +143,14 @@ QStringList AppController::mediaRoots() const
 
         if (QDir(picturesPath).exists()) {
             roots << picturesPath;
+        }
+
+        const QString videosPath = 
+            deviceInfo.absoluteFilePath()
+            + "/Videos";
+        
+        if (QDir(videosPath).exists()) {
+            roots << videosPath;
         }
     }
 

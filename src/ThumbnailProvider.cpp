@@ -1,5 +1,4 @@
 #include "ThumbnailProvider.h"
-
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDir>
@@ -10,6 +9,12 @@
 #include <QStandardPaths>
 #include <QUrl>
 #include <QDebug>
+#include <QMediaPlayer>
+#include <QVideoProbe>
+#include <QVideoFrame>
+#include <QAbstractVideoBuffer>
+#include <QEventLoop>
+#include <QTimer>
 
 
 /*
@@ -103,6 +108,17 @@ void ThumbnailWorker::run()
 
 
 bool ThumbnailWorker::generateThumbnail(
+    const QString &filePath,
+    const QString &thumbnailPath
+)
+{
+    return generateImageThumbnail(
+        filePath,
+        thumbnailPath
+    );
+}
+
+bool ThumbnailWorker::generateImageThumbnail(
     const QString &imagePath,
     const QString &thumbnailPath
 )
@@ -114,7 +130,6 @@ bool ThumbnailWorker::generateThumbnail(
     QSize sourceSize = reader.size();
 
     if (sourceSize.isValid()) {
-
         QSize decodeSize = sourceSize;
 
         decodeSize.scale(
@@ -122,29 +137,23 @@ bool ThumbnailWorker::generateThumbnail(
             Qt::KeepAspectRatio
         );
 
-        reader.setScaledSize(
-            decodeSize
-        );
+        reader.setScaledSize(decodeSize);
     }
 
     QImage image = reader.read();
 
     if (image.isNull()) {
-
         qWarning()
-            << "No se pudo generar thumbnail:"
+            << "No se pudo generar thumbnail de imagen:"
             << imagePath
             << reader.errorString();
 
         return false;
     }
 
-    /*
-     * Some formats may ignore setScaledSize().
-     */
     if (
-        image.width() > 320
-        || image.height() > 320
+        image.width() > 320 ||
+        image.height() > 320
     ) {
         image = image.scaled(
             320,
@@ -154,21 +163,186 @@ bool ThumbnailWorker::generateThumbnail(
         );
     }
 
-    if (!image.save(
-            thumbnailPath,
-            "JPG",
-            80)) {
+    return image.save(
+        thumbnailPath,
+        "JPG",
+        80
+    );
+}
 
+bool ThumbnailProvider::generateVideoThumbnail(
+    const QString &videoPath,
+    const QString &thumbnailPath
+)
+{
+    QMediaPlayer player;
+    QVideoProbe probe;
+
+    QImage grabbedImage;
+    bool frameReady = false;
+    bool failed = false;
+
+    QEventLoop loop;
+
+    QTimer timeout;
+    timeout.setSingleShot(true);
+
+    connect(
+        &timeout,
+        &QTimer::timeout,
+        &loop,
+        &QEventLoop::quit
+    );
+
+    connect(
+        &probe,
+        &QVideoProbe::videoFrameProbed,
+        [&](const QVideoFrame &frame)
+        {
+            qDebug()
+                << "VIDEO FRAME"
+                << videoPath
+                << "valid:" << frame.isValid()
+                << "size:" << frame.size()
+                << "pixelFormat:" << frame.pixelFormat();
+            
+            QVideoFrame clone(frame);
+
+            if (!clone.isValid()) {
+                qWarning()
+                    << "Frame de video no válido"
+                    << videoPath;
+                return;
+            }
+
+            if (!clone.map(
+                    QAbstractVideoBuffer::ReadOnly)) {
+                qWarning()
+                    << "No se puede mapear frame:"
+                    << videoPath
+                    << "pixelFormat:"
+                    << clone.pixelFormat();
+                
+                return;
+            }
+
+            QImage::Format imageFormat =
+                QVideoFrame::imageFormatFromPixelFormat(
+                    clone.pixelFormat()
+                );
+                qDebug()
+                    << "QImage format:"
+                    << imageFormat;
+
+            if (imageFormat != QImage::Format_Invalid) {
+                QImage image(
+                    clone.bits(),
+                    clone.width(),
+                    clone.height(),
+                    clone.bytesPerLine(),
+                    imageFormat
+                );
+
+                grabbedImage = image.copy();
+                frameReady = true;
+            } else {
+                qWarning()
+                    <<"Formato de frame no convertible a QImage:"
+                    << clone.pixelFormat()
+                    << "video:"
+                    << videoPath;
+            }
+
+            clone.unmap();
+
+            if (frameReady) {
+                player.stop();
+                loop.quit();
+            }
+        }
+    );
+
+    connect(
+        &player,
+        static_cast<void (QMediaPlayer::*)(
+            QMediaPlayer::MediaStatus)>(
+            &QMediaPlayer::mediaStatusChanged
+        ),
+        [&](QMediaPlayer::MediaStatus status)
+        {
+            if (status == QMediaPlayer::LoadedMedia ||
+                status == QMediaPlayer::BufferedMedia) {
+
+                player.play();
+                player.setPosition(1000);
+            }
+
+            if (status == QMediaPlayer::InvalidMedia) {
+                failed = true;
+                loop.quit();
+            }
+        }
+    );
+
+    connect(
+        &player,
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+        &QMediaPlayer::errorOccurred,
+#else
+        static_cast<void (QMediaPlayer::*)(QMediaPlayer::Error)>(
+            &QMediaPlayer::error
+        ),
+#endif
+        [&](QMediaPlayer::Error error)
+        {
+            Q_UNUSED(error);
+
+            failed = true;
+            loop.quit();
+        }
+    );
+
+    if (!probe.setSource(&player)) {
         qWarning()
-            << "No se pudo guardar thumbnail:"
-            << thumbnailPath;
+            << "No se pudo asociar QVideoProbe al reproductor";
 
         return false;
     }
 
-    return true;
-}
+    player.setMuted(true);
+    player.setVolume(0);
+    player.setMedia(
+        QUrl::fromLocalFile(videoPath)
+    );
 
+    timeout.start(5000);
+    loop.exec();
+    timeout.stop();
+
+    if (failed ||
+        !frameReady ||
+        grabbedImage.isNull()) {
+
+        qWarning()
+            << "No se pudo generar thumbnail de vídeo:"
+            << videoPath;
+
+        return false;
+    }
+
+    grabbedImage = grabbedImage.scaled(
+        320,
+        320,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    );
+
+    return grabbedImage.save(
+        thumbnailPath,
+        "JPG",
+        80
+    );
+}
 
 /*
  * ThumbnailProvider
@@ -296,10 +470,22 @@ QString ThumbnailProvider::requestThumbnail(
             emit busyChanged();
         }
 
-        m_worker.enqueue(
-            imagePath,
-            thumbnailPath
-        );
+        if (isVideoFile(imagePath)) {
+
+            qDebug()
+                << "Generando thumbnail de video EN HILO PRINCIPAL:"
+                << imagePath;
+
+            const bool success = generateVideoThumbnail(imagePath, thumbnailPath);
+
+            onThumbnailGenerated(imagePath, thumbnailPath, success);
+
+        } else {
+            m_worker.enqueue(
+                imagePath,
+                thumbnailPath
+            );
+        }
     }
 
     /*
@@ -358,4 +544,22 @@ void ThumbnailProvider::clearCache()
             fileInfo.absoluteFilePath()
         );
     }
+}
+
+bool ThumbnailProvider::isVideoFile(
+    const QString &filePath
+) const
+{
+    const QString suffix =
+        QFileInfo(filePath)
+            .suffix()
+            .toLower();
+
+    return
+        suffix == "mp4" ||
+        suffix == "mkv" ||
+        suffix == "avi" ||
+        suffix == "mov" ||
+        suffix == "webm" ||
+        suffix == "3gp";
 }

@@ -1,6 +1,6 @@
 {
     "name": "quickgal.nacho",
-    "description": "Quick gallery app",
+    "description": "Quick Gallery app",
     "architecture": "$ENV{ARCH}",
     "title": "QuickGal",
     "hooks": {
@@ -9,7 +9,7 @@
             "desktop":  "quickgal.desktop"
         }
     },
-    "version": "1.0.2",
+    "version": "1.0.3",
     "maintainer": "Ignacio Perez Anguio <i.perez.anguio@gmail.com>",
     "framework" : "$ENV{CLICK_FRAMEWORK}"
 }

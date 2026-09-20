@@ -1,6 +1,9 @@
 {
     "policy_groups": [
         "picture_files_read",
+        "video_files_read",
+        "video",
+        "audio",
         "keep-display-on"
     ],
     "policy_version": "$ENV{APPARMOR_POLICY}"

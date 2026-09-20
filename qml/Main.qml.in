@@ -1,6 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtSystemInfo 5.5
+
 @QML_COMPONENTS_IMPORT@
 @QML_POPUPS_IMPORT@
 
@@ -19,6 +20,15 @@ Window {
 
         anchors.fill: parent
         applicationName: "quickgal.nacho"
+
+        function openVideo(videoPath) {
+            var videoUrl = "video://" + videoPath
+            console.log("Abriendo video mediante URL dispatcher: ", videoUrl)
+
+            var ok = Qt.openUrlExternally(videoUrl)
+
+            console.log("Qt.openUrlExternally devuelve:", ok)
+        }
 
         PageStack {
             id: pageStack
@@ -76,8 +86,27 @@ Window {
                     model: albumModel
 
                     delegate: Item {
+                        id: albumDelegate
+
+                        property string albumCoverPath: coverPath
+                        property string albumThumbnailSource: ""
+
                         width: albumGrid.cellWidth
                         height: albumGrid.cellHeight
+
+                        Component.onCompleted: {
+                            albumThumbnailSource = thumbnailProvider.requestThumbnail(albumCoverPath)
+                        }
+
+                        Connections {
+                            target: thumbnailProvider
+
+                            onThumbnailReady: {
+                                if (imagePath === albumDelegate.albumCoverPath) {
+                                    albumDelegate.albumThumbnailSource = thumbnailUrl
+                                }
+                            }
+                        }
 
                         Rectangle {
                             anchors {
@@ -104,7 +133,8 @@ Window {
                                     Image {
                                         anchors.fill: parent
 
-                                        source: "file://" + coverPath
+                                        //source: "file://" + albumDelegate.albumThumbnailSource
+                                        source: albumDelegate.albumThumbnailSource
 
                                         fillMode: Image.PreserveAspectCrop
 
@@ -275,6 +305,9 @@ Window {
                         }
 
                         Rectangle {
+                            /* 
+                             * Pictures
+                             */
                             anchors {
                                 fill : parent
                                 margins: units.gu(0.25)                                
@@ -291,18 +324,47 @@ Window {
                             }
                         }
 
+                        Rectangle {
+                            /*
+                             * Videos, added and icon to differentiate from pictures
+                             */
+                            visible: isVideo
+
+                            anchors {
+                                right: parent.right
+                                bottom: parent.bottom
+                                margins: units.gu(0.5)
+                            }
+
+                            width: units.gu(3)
+                            height: units.gu(3)
+                            radius: width / 2
+
+                            color: "#80000000"
+
+                            Label {
+                                anchors.centerIn: parent
+                                text: "▶"
+                                color: "white"
+                            }
+                        }
+
                         MouseArea {
                             anchors.fill: parent
 
                             onClicked: {
-                                console.log("Abriendo imagen: ",path, " índice:", index)
-
-                                pageStack.push(
-                                    imagePageComponent,
-                                    {
-                                        initialIndex: index
-                                    }
-                                )
+                                if (isVideo) {
+                                    console.log("Abriendo video: ", path, " índice", index)
+                                    mainView.openVideo(path)
+                                } else {
+                                    console.log("Abriendo imagen: ",path, " índice:", index)
+                                    pageStack.push(
+                                        imagePageComponent,
+                                        {
+                                            initialIndex: index
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -988,7 +1050,8 @@ Window {
                             /*
                              * Last pic --> stop slide presentation
                             */
-                            stop()
+                            slideshowTimer.stop()
+                            pageStack.pop()
                         }
                     }
                 }

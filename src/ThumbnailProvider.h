@@ -38,6 +38,11 @@ protected:
 
 private:
     bool generateThumbnail(
+        const QString &filePath,
+        const QString &thumbnailPath
+    );
+
+    bool generateImageThumbnail(
         const QString &imagePath,
         const QString &thumbnailPath
     );
@@ -109,6 +114,16 @@ private:
     ThumbnailWorker m_worker;
 
     QSet<QString> m_pending;
+
+    bool isVideoFile(
+        const QString &filePath
+    ) const;
+
+    bool generateVideoThumbnail(
+        const QString &videoPath,
+        const QString &thumbnailPath
+    );
+
 };
 
 #endif

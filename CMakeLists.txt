@@ -96,6 +96,7 @@ find_package(Qt5 REQUIRED COMPONENTS
     Gui
     Qml
     Quick
+    Multimedia
 )
 
 add_executable(${PROJECT_NAME}
@@ -112,6 +113,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Gui
     Qt5::Qml
     Qt5::Quick
+    Qt5::Multimedia
 )
 
 install(TARGETS ${PROJECT_NAME}
