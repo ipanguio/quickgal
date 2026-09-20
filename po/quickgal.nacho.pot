@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-20 17:12+0000\n"
+"POT-Creation-Date: 2026-09-20 20:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,73 +18,73 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../qml/Main.qml.in:55 ../qml/Main.qml.in:252
+#: ../qml/Main.qml.in:63 ../qml/Main.qml.in:268
 msgid "Opciones"
 msgstr ""
 
-#: ../qml/Main.qml.in:160
+#: ../qml/Main.qml.in:176
 msgid "%1 elemento"
 msgid_plural "%1 elementos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../qml/Main.qml.in:198 ../qml/Main.qml.in:419
+#: ../qml/Main.qml.in:214 ../qml/Main.qml.in:445
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml.in:218
+#: ../qml/Main.qml.in:234
 msgid "Mostrar ocultos"
 msgstr ""
 
-#: ../qml/Main.qml.in:401
+#: ../qml/Main.qml.in:427
 msgid "Generando miniaturas…"
 msgstr ""
 
-#: ../qml/Main.qml.in:439
+#: ../qml/Main.qml.in:465
 msgid "Presentación de diapositivas"
 msgstr ""
 
-#: ../qml/Main.qml.in:494
+#: ../qml/Main.qml.in:520
 msgid "Ordenar por:"
 msgstr ""
 
-#: ../qml/Main.qml.in:500
+#: ../qml/Main.qml.in:526
 msgid "Criterio"
 msgstr ""
 
-#: ../qml/Main.qml.in:509
+#: ../qml/Main.qml.in:535
 msgid "Nombre"
 msgstr ""
 
-#: ../qml/Main.qml.in:510
+#: ../qml/Main.qml.in:536
 msgid "Ruta"
 msgstr ""
 
-#: ../qml/Main.qml.in:511
+#: ../qml/Main.qml.in:537
 msgid "Tamaño"
 msgstr ""
 
-#: ../qml/Main.qml.in:512
+#: ../qml/Main.qml.in:538
 msgid "Fecha de modificación"
 msgstr ""
 
-#: ../qml/Main.qml.in:513
+#: ../qml/Main.qml.in:539
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml.in:553
+#: ../qml/Main.qml.in:579
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml.in:562
+#: ../qml/Main.qml.in:588
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:563
+#: ../qml/Main.qml.in:589
 msgid "Descendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:588
+#: ../qml/Main.qml.in:614
 msgid "Cerrar"
 msgstr ""
 

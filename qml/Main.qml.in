@@ -1,6 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtSystemInfo 5.5
+import Ubuntu.Thumbnailer 0.1
 
 @QML_COMPONENTS_IMPORT@
 @QML_POPUPS_IMPORT@
@@ -23,11 +24,18 @@ Window {
 
         function openVideo(videoPath) {
             var videoUrl = "video://" + videoPath
-            console.log("Abriendo video mediante URL dispatcher: ", videoUrl)
-
             var ok = Qt.openUrlExternally(videoUrl)
+        }
 
-            console.log("Qt.openUrlExternally devuelve:", ok)
+        function isVideoPath(filePath){
+            var lower = filePath.toLowerCase()
+
+            return lower.endsWith(".mp4") || 
+                   lower.endsWith(".mkv") || 
+                   lower.endsWith(".avi") || 
+                   lower.endsWith(".mov") || 
+                   lower.endsWith(".webm") || 
+                   lower.endsWith(".3gp")
         }
 
         PageStack {
@@ -95,7 +103,9 @@ Window {
                         height: albumGrid.cellHeight
 
                         Component.onCompleted: {
-                            albumThumbnailSource = thumbnailProvider.requestThumbnail(albumCoverPath)
+                            if (!mainView.isVideoPath(albumCoverPath)) {
+                                albumThumbnailSource = thumbnailProvider.requestThumbnail(albumCoverPath)
+                            }
                         }
 
                         Connections {
@@ -134,12 +144,18 @@ Window {
                                         anchors.fill: parent
 
                                         //source: "file://" + albumDelegate.albumThumbnailSource
-                                        source: albumDelegate.albumThumbnailSource
+                                        //source: albumDelegate.albumThumbnailSource
+                                        source: mainView.isVideoPath(albumDelegate.albumCoverPath)
+                                            ? "image://thumbnailer/" +
+                                              Qt.resolvedUrl(albumDelegate.albumCoverPath)
+                                            : albumDelegate.albumThumbnailSource
 
                                         fillMode: Image.PreserveAspectCrop
 
-                                        sourceSize.width: width
-                                        sourceSize.height: height
+                                        sourceSize: Qt.size(
+                                            Math.max(1, Math.round(width)),
+                                            Math.max(1, Math.round(height))
+                                        )
 
                                         asynchronous: true
                                         cache: true
@@ -291,14 +307,16 @@ Window {
                         property string thumbnailSource: ""
 
                         Component.onCompleted: {
-                            thumbnailSource = thumbnailProvider.requestThumbnail(mediaPath)
+                            if (!isVideo) {
+                                thumbnailSource = thumbnailProvider.requestThumbnail(mediaPath)
+                            }
                         }
 
                         Connections {
                             target: thumbnailProvider
 
                             onThumbnailReady: {
-                                if (imagePath === mediaDelegate.mediaPath) {
+                                if (!isVideo && imagePath === mediaDelegate.mediaPath) {
                                     mediaDelegate.thumbnailSource = thumbnailUrl
                                 }
                             }
@@ -317,7 +335,15 @@ Window {
 
                             Image {
                                 anchors.fill: parent
-                                source: mediaDelegate.thumbnailSource
+                                source: isVideo
+                                    ? "image://thumbnailer/" + Qt.resolvedUrl(path)
+                                    : mediaDelegate.thumbnailSource
+
+                                sourceSize: Qt.size(
+                                    Math.max(1, Math.round(width)),
+                                    Math.max(1, Math.round(height))
+                                )
+                                
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous : true
                                 cache: true
