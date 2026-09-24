@@ -1,5 +1,6 @@
 #include "MediaModel.h"
 #include <algorithm>
+#include <QDebug>
 
 MediaModel::MediaModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -69,7 +70,10 @@ void MediaModel::setItems(
 
     m_items = items;
 
-    endResetModel();
+    endResetModel(); 
+
+    emit videoOnlyChanged();
+
 }
 
 void MediaModel::clear()
@@ -77,6 +81,7 @@ void MediaModel::clear()
     beginResetModel();
 
     m_items.clear();
+    emit videoOnlyChanged();
 
     endResetModel();
 }
@@ -135,4 +140,19 @@ void MediaModel::sortItems(const QString &field, bool ascending)
     );
 
     endResetModel();
+}
+
+bool MediaModel::videoOnly() const
+{
+    if (m_items.isEmpty()) {
+        return false;
+    }
+
+    for (const MediaItem &item : m_items) {
+        if (!item.isVideo){
+            return false;
+        }
+    }
+
+    return true;
 }

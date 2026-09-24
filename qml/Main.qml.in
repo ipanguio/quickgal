@@ -142,9 +142,7 @@ Window {
 
                                     Image {
                                         anchors.fill: parent
-
-                                        //source: "file://" + albumDelegate.albumThumbnailSource
-                                        //source: albumDelegate.albumThumbnailSource
+                                        
                                         source: mainView.isVideoPath(albumDelegate.albumCoverPath)
                                             ? "image://thumbnailer/" +
                                               Qt.resolvedUrl(albumDelegate.albumCoverPath)
@@ -156,6 +154,12 @@ Window {
                                             Math.max(1, Math.round(width)),
                                             Math.max(1, Math.round(height))
                                         )
+
+                                        onStatusChanged: {
+                                            if (status === Image.Error) {
+                                                console.log("No se pudo generar miniatura: ", path)
+                                            }
+                                        }
 
                                         asynchronous: true
                                         cache: true
@@ -259,6 +263,14 @@ Window {
 
                 property string albumName: ""
 
+                Connections {
+                    target: mediaModel
+
+                    onVideoOnlyChanged: {
+                        console.log("mediaModel.videoOnly cambiado:", mediaModel.videoOnly)
+                        }
+                }
+
                 header: PageHeader {
                     id: albumHeader
                     title: albumPage.albumName
@@ -266,7 +278,7 @@ Window {
                     trailingActionBar.actions: [
                         Action {
                             text: i18n.tr("Opciones")
-                            iconName: "navigation-menu"
+                            iconName: "navigation-menu" 
 
                             onTriggered: {
                                 PopupUtils.open(
@@ -380,10 +392,8 @@ Window {
 
                             onClicked: {
                                 if (isVideo) {
-                                    console.log("Abriendo video: ", path, " índice", index)
                                     mainView.openVideo(path)
                                 } else {
-                                    console.log("Abriendo imagen: ",path, " índice:", index)
                                     pageStack.push(
                                         imagePageComponent,
                                         {
@@ -459,7 +469,8 @@ Window {
                             }
 
                             ListItem {
-                                height: units.gu(6)
+                                visible: !mediaModel.videoOnly
+                                height: visible ? units.gu(6) : 0
 
                                 ListItemLayout{
                                     title.text : i18n.tr("Presentación de diapositivas")
@@ -1003,6 +1014,7 @@ Window {
                 property int slideInterval: 3000
 
                 Component.onCompleted: {
+                    window.visibility = Window.FullScreen
                     slideshowViewer.currentIndex = 0
                     slideshowViewer.positionViewAtIndex(0, ListView.Beginning)
                     slideshowTimer.start()
@@ -1010,6 +1022,7 @@ Window {
 
                 Component.onDestruction: {
                     screenSaver.screenSaverEnabled = true
+                    window.visibility = Window.AutomaticVisibility
                 }
 
                 ListView {

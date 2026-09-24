@@ -23,6 +23,12 @@ class MediaModel : public QAbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(
+        bool videoOnly
+        READ videoOnly
+        NOTIFY videoOnlyChanged
+    )
+
 public:
     enum MediaRoles {
         PathRole = Qt::UserRole + 1,
@@ -43,6 +49,14 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
+    bool videoOnly() const;
+
+    Q_PROPERTY(
+        bool videoOnly
+        READ videoOnly
+        NOTIFY videoOnlyChanged
+    )
+
     void setItems(const QVector<MediaItem> &items);
 
     void clear();
@@ -51,6 +65,9 @@ public:
         const QString &field,
         bool ascending
     );
+
+signals:
+    void videoOnlyChanged();
 
 private:
     QVector<MediaItem> m_items;

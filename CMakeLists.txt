@@ -63,8 +63,14 @@ configure_file(
     manifest.json.in
     ${CMAKE_CURRENT_BINARY_DIR}/manifest.json
 )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/manifest.json DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES ${PROJECT_NAME}.apparmor DESTINATION ${DATA_DIR})
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/manifest.json
+    DESTINATION .
+)
+install(
+    FILES ${PROJECT_NAME}.apparmor
+    DESTINATION ${DATA_DIR}
+)
 install(DIRECTORY assets DESTINATION ${DATA_DIR})
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/qml/Main.qml
@@ -118,6 +124,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Multimedia
 )
 
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${DATA_DIR}
+install(
+    TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION .
 )
