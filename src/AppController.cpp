@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QStringList>
 #include <QDebug>
@@ -155,4 +156,25 @@ QStringList AppController::mediaRoots() const
     }
 
     return roots;
+}
+
+bool AppController::deleteFile(const QString &path)
+{
+    qDebug() << "Iniciando borrado: " << path;
+
+    QFile file(path);
+
+    if (!file.exists()) {
+        qDebug() <<"El fichero no existe: " << path;
+        return false;
+    }
+
+    if (!file.remove()) {
+        qDebug() <<"Error al borrar: " << file.errorString();
+        return false;
+    }
+    
+    qDebug() << "Fichero borrado correctamente:" << path;
+    
+    return true;
 }

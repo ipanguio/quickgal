@@ -654,6 +654,17 @@ Window {
                           + " - "
                           + imageViewer.currentItem.mediaFileName
                         :""
+                    
+                    trailingActionBar.actions: [
+                        Action {
+                            text: i18n.tr("Opciones:")
+                            iconName: "navigation-menu"
+
+                            onTriggered: {
+                                PopupUtils.open(imageMenuComponent, imageHeader.trailingActionBar)
+                            }
+                        }
+                    ]
                 }
 
                 ListView {
@@ -694,6 +705,7 @@ Window {
                         height: imageViewer.height
 
                         property string mediaFileName: fileName
+                        property string mediaPath: path
 
                         color: "black"
 
@@ -987,6 +999,66 @@ Window {
                             "Imagen actual:",
                             currentIndex
                         )
+                    }
+                }
+
+                Component {
+                    id: imageMenuComponent
+
+                    Popover {
+                        id: imageMenu
+
+                        Column {
+                            width: units.gu(25)
+
+                            ListItem {
+                                height: units.gu(6)
+
+                                ListItemLayout {
+                                    title.text: i18n.tr("Borrar imagen")
+                                }
+
+                                onClicked: {
+                                    PopupUtils.close(imageMenu)
+                                    
+                                    PopupUtils.open(deleteImageDialogComponent, imagePage)
+                                    console.log("Borrar ", imageViewer.currentItem.mediaPath)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: deleteImageDialogComponent
+
+                    Dialog {
+                        id: deleteImageDialog
+
+                        title: i18n.tr("Atención")
+                        text: i18n.tr("¿Estás seguro de querer borrar esta imágen?")
+
+                        Button {
+                            text: i18n.tr("Cancelar")
+
+                            onClicked: {
+                                PopupUtils.close(deleteImageDialog)
+                            }
+                        }
+
+                        Button {
+                            text: i18n.tr("Borrar")
+
+                            onClicked: {
+                                var pathToDelete = imageViewer.currentItem.mediaPath
+                                
+                                var deleted = appController.deleteFile(pathToDelete)
+
+                                console.log("Resultado deleteFile: ", deleted, pathToDelete)
+                                
+                                PopupUtils.close(deleteImageDialog)
+                            }
+                        }
                     }
                 }
             }

@@ -1,6 +1,6 @@
 {
     "policy_groups": [
-        "picture_files_read",
+        "picture_files",
         "video_files_read",
         "video",
         "audio",

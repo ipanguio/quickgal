@@ -9,7 +9,7 @@
             "desktop":  "quickgal.desktop"
         }
     },
-    "version": "1.0.3",
+    "version": "1.0.4",
     "maintainer": "Ignacio Perez Anguio <i.perez.anguio@gmail.com>",
     "framework" : "$ENV{CLICK_FRAMEWORK}"
 }

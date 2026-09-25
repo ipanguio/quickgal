@@ -45,6 +45,8 @@ public:
         bool ascending
     );
 
+    Q_INVOKABLE bool deleteFile(const QString &path);
+
 signals:
     void showHiddenAlbumsChanged();
 

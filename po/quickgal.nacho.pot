@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-24 15:18+0000\n"
+"POT-Creation-Date: 2026-09-25 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,6 +88,26 @@ msgstr ""
 msgid "Cerrar"
 msgstr ""
 
+#: ../qml/Main.qml.in:660
+msgid "Opciones:"
+msgstr ""
+
+#: ../qml/Main.qml.in:1018 ../qml/Main.qml.in:1038
+msgid "Borrar imagen"
+msgstr ""
+
+#: ../qml/Main.qml.in:1039
+msgid "¿Estás seguro de querer borrar esta imágen?"
+msgstr ""
+
+#: ../qml/Main.qml.in:1042
+msgid "Cancelar"
+msgstr ""
+
+#: ../qml/Main.qml.in:1050
+msgid "Borrar"
+msgstr ""
+
 #: quickgal.desktop.in.h:1
-msgid "quickgal"
+msgid "QuickGal"
 msgstr ""
