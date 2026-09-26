@@ -1,6 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtSystemInfo 5.5
+import Lomiri.Content 1.3
 
 @QML_THUMBNAILER_IMPORT@
 @QML_COMPONENTS_IMPORT@
@@ -641,6 +642,151 @@ Window {
 
                 property int initialIndex: 0
                 property bool fullScreen: false
+                property var activeTransfer: null
+
+                Component {
+                    id: contentItemComponent
+
+                    ContentItem {
+                    }
+                }
+
+                Component {
+                    id: imageMenuComponent
+
+                    Popover {
+                        id: imageMenu
+
+                        Column {
+                            width: units.gu(25)
+
+                            ListItem {
+                                height: units.gu(5)
+
+                                ListItemLayout {
+                                    title.text: i18n.tr("Borrar imagen")
+                                }
+
+                                onClicked: {
+                                    PopupUtils.close(imageMenu)
+                                    
+                                    PopupUtils.open(deleteImageDialogComponent, imagePage)
+                                    console.log("Borrar ", imageViewer.currentItem.mediaPath)
+                                }
+                            }
+
+                            ListItem {
+                                height: units.gu(5)
+
+                                ListItemLayout {
+                                    title.text: i18n.tr("Abrir con ...")
+                                }
+
+                                onClicked: {
+                                    console.log("Abrir con ... lanzado para ", imageViewer.currentItem.mediaPath)
+                                    PopupUtils.close(imageMenu)
+                                    /*
+                                     * Start content Peer
+                                    */
+                                    imagePeerPicker.visible = true
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: deleteImageDialogComponent
+
+                    Dialog {
+                        id: deleteImageDialog
+
+                        title: i18n.tr("Atención")
+                        text: i18n.tr("¿Estás seguro de querer borrar esta imágen?")
+
+                        Button {
+                            text: i18n.tr("Cancelar")
+
+                            onClicked: {
+                                PopupUtils.close(deleteImageDialog)
+                            }
+                        }
+
+                        Button {
+                            text: i18n.tr("Borrar")
+
+                            onClicked: {
+                                var pathToDelete = imageViewer.currentItem.mediaPath
+                                
+                                var deleted = appController.deleteFile(pathToDelete)
+
+                                console.log("Resultado deleteFile: ", deleted, pathToDelete)
+                                
+                                PopupUtils.close(deleteImageDialog)
+                            }
+                        }
+                    }
+                }
+
+                ContentPeerPicker {
+                    id: imagePeerPicker
+
+                    anchors.fill: parent
+                    visible: false
+                    z: 1000
+
+                    showTitle: true
+                    contentType: ContentType.Pictures
+                    handler: ContentHandler.Destination
+
+                    onPeerSelected: {
+                        console.log("Opción 'Aplicación seleccionada' devuelve: ", peer.name)
+
+                        imagePage.activeTransfer = peer.request()
+
+                        var item =
+                            contentItemComponent.createObject(
+                                imagePage,
+                                {
+                                    "url":
+                                        "file://" + 
+                                        imageViewer.currentItem.mediaPath
+                                }
+                            )
+
+                        imagePage.activeTransfer.items = [ item ]
+
+                        console.log("Enviando: ", item.url)
+
+                        imagePage.activeTransfer.state = ContentTransfer.Charged
+
+                        imagePeerPicker.visible = false
+                    }
+
+                    onCancelPressed: {
+                        visible: false
+                    }
+
+                    Connections {
+                        target: imagePage.activeTransfer
+                                ? imagePage.activeTransfer
+                                : null
+
+                        onStateChanged: {
+                            console.log("ContentTransfer state: ", imagePage.activeTransfer.state)
+
+                            if (imagePage.activeTransfer.state ===
+                                ContentTransfer.Aborted) {
+                                    console.log("Transferencia peer cancelada")
+                            }
+
+                            if (imagePage.activeTransfer.state ===
+                                ContentTransfer.Collected) {
+                                    console.log("Contenido recogido por el destino")
+                            }
+                        }
+                    }
+                }
 
                 header: PageHeader {
                     id: imageHeader
@@ -999,66 +1145,6 @@ Window {
                             "Imagen actual:",
                             currentIndex
                         )
-                    }
-                }
-
-                Component {
-                    id: imageMenuComponent
-
-                    Popover {
-                        id: imageMenu
-
-                        Column {
-                            width: units.gu(25)
-
-                            ListItem {
-                                height: units.gu(6)
-
-                                ListItemLayout {
-                                    title.text: i18n.tr("Borrar imagen")
-                                }
-
-                                onClicked: {
-                                    PopupUtils.close(imageMenu)
-                                    
-                                    PopupUtils.open(deleteImageDialogComponent, imagePage)
-                                    console.log("Borrar ", imageViewer.currentItem.mediaPath)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Component {
-                    id: deleteImageDialogComponent
-
-                    Dialog {
-                        id: deleteImageDialog
-
-                        title: i18n.tr("Atención")
-                        text: i18n.tr("¿Estás seguro de querer borrar esta imágen?")
-
-                        Button {
-                            text: i18n.tr("Cancelar")
-
-                            onClicked: {
-                                PopupUtils.close(deleteImageDialog)
-                            }
-                        }
-
-                        Button {
-                            text: i18n.tr("Borrar")
-
-                            onClicked: {
-                                var pathToDelete = imageViewer.currentItem.mediaPath
-                                
-                                var deleted = appController.deleteFile(pathToDelete)
-
-                                console.log("Resultado deleteFile: ", deleted, pathToDelete)
-                                
-                                PopupUtils.close(deleteImageDialog)
-                            }
-                        }
                     }
                 }
             }
