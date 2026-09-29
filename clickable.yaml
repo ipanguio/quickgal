@@ -1,4 +1,3 @@
 clickable_minimum_required: 8.8.0
 builder: cmake
 kill: quickgal
-skip_review: true
