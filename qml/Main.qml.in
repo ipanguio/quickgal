@@ -1,11 +1,11 @@
 import QtQuick 2.7
 import QtQuick.Window 2.2
 import QtSystemInfo 5.5
-import Lomiri.Content 1.3
 
 @QML_THUMBNAILER_IMPORT@
 @QML_COMPONENTS_IMPORT@
 @QML_POPUPS_IMPORT@
+@QML_CONTENT_IMPORT@
 
 Window {
     id: window
@@ -194,12 +194,25 @@ Window {
                                     pageStack.push(
                                         albumPageComponent,
                                         {
-                                            albumName: name
+                                            albumName: name,
+                                            albumName: path
                                         }
                                     )
                                 }
                             }
                         }
+                    }
+                }
+
+                PullToRefresh {
+                    target: albumGrid
+
+                    onRefresh: {
+                        console.log("Recargando álbumes: ")
+
+                        appController.refreshAlbums()
+
+                        albumGrid.positionViewAtBeginning()
                     }
                 }
 
@@ -263,6 +276,7 @@ Window {
                 id: albumPage
 
                 property string albumName: ""
+                property string albumPath: ""
 
                 Connections {
                     target: mediaModel
@@ -404,6 +418,20 @@ Window {
                                 }
                             }
                         }
+                    }
+                }
+
+                PullToRefresh {
+                    target: mediaGrid
+
+                    onRefresh: {
+                        console.log("Recargando album: ", albumPage.albumPath)
+
+                        appController.openAlbum(albumPage.albumPath)
+
+
+                        mediaGrid.positionViewAtBeginning()
+
                     }
                 }
 

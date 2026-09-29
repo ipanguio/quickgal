@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: quickgal.nacho\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-26 17:08+0000\n"
+"POT-Creation-Date: 2026-09-29 17:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,111 +18,102 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: ../qml/Main.qml.in:64 ../qml/Main.qml.in:281 ../qml/Main_lomiri.qml:44
-#: ../qml/Main_lomiri.qml:241 ../qml/Main_xenial.qml:44
-#: ../qml/Main_xenial.qml:241
+#: ../qml/Main.qml.in:64 ../qml/Main.qml.in:295
 msgid "Opciones"
 msgstr ""
 
-#: ../qml/Main.qml.in:181 ../qml/Main_lomiri.qml:163 ../qml/Main_xenial.qml:163
+#: ../qml/Main.qml.in:181
 msgid "%1 elemento"
 msgid_plural "%1 elementos"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../qml/Main.qml.in:219 ../qml/Main.qml.in:456 ../qml/Main_lomiri.qml:207
-#: ../qml/Main_lomiri.qml:326 ../qml/Main_lomiri.qml:358
-#: ../qml/Main_xenial.qml:207 ../qml/Main_xenial.qml:326
-#: ../qml/Main_xenial.qml:358
+#: ../qml/Main.qml.in:232 ../qml/Main.qml.in:484
 msgid "Ordenar por"
 msgstr ""
 
-#: ../qml/Main.qml.in:239
+#: ../qml/Main.qml.in:252
 msgid "Mostrar ocultos"
 msgstr ""
 
-#: ../qml/Main.qml.in:438
+#: ../qml/Main.qml.in:466
 msgid "Generando miniaturas…"
 msgstr ""
 
-#: ../qml/Main.qml.in:477
+#: ../qml/Main.qml.in:505
 msgid "Presentación de diapositivas"
 msgstr ""
 
-#: ../qml/Main.qml.in:532
+#: ../qml/Main.qml.in:560
 msgid "Ordenar por:"
 msgstr ""
 
-#: ../qml/Main.qml.in:538 ../qml/Main_lomiri.qml:391 ../qml/Main_xenial.qml:391
+#: ../qml/Main.qml.in:566
 msgid "Criterio"
 msgstr ""
 
-#: ../qml/Main.qml.in:547 ../qml/Main_lomiri.qml:401 ../qml/Main_xenial.qml:401
+#: ../qml/Main.qml.in:575
 msgid "Nombre"
 msgstr ""
 
-#: ../qml/Main.qml.in:548 ../qml/Main_lomiri.qml:402 ../qml/Main_xenial.qml:402
+#: ../qml/Main.qml.in:576
 msgid "Ruta"
 msgstr ""
 
-#: ../qml/Main.qml.in:549 ../qml/Main_lomiri.qml:403 ../qml/Main_xenial.qml:403
+#: ../qml/Main.qml.in:577
 msgid "Tamaño"
 msgstr ""
 
-#: ../qml/Main.qml.in:550 ../qml/Main_lomiri.qml:404 ../qml/Main_xenial.qml:404
+#: ../qml/Main.qml.in:578
 msgid "Fecha de modificación"
 msgstr ""
 
-#: ../qml/Main.qml.in:551 ../qml/Main_lomiri.qml:405 ../qml/Main_xenial.qml:405
+#: ../qml/Main.qml.in:579
 msgid "Fecha de creación"
 msgstr ""
 
-#: ../qml/Main.qml.in:591 ../qml/Main_lomiri.qml:444 ../qml/Main_xenial.qml:444
+#: ../qml/Main.qml.in:619
 msgid "Dirección"
 msgstr ""
 
-#: ../qml/Main.qml.in:600 ../qml/Main_lomiri.qml:454 ../qml/Main_xenial.qml:454
+#: ../qml/Main.qml.in:628
 msgid "Ascendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:601 ../qml/Main_lomiri.qml:455 ../qml/Main_xenial.qml:455
+#: ../qml/Main.qml.in:629
 msgid "Descendente"
 msgstr ""
 
-#: ../qml/Main.qml.in:626
+#: ../qml/Main.qml.in:654
 msgid "Cerrar"
 msgstr ""
 
-#: ../qml/Main.qml.in:667
+#: ../qml/Main.qml.in:695
 msgid "Borrar imagen"
 msgstr ""
 
-#: ../qml/Main.qml.in:682
+#: ../qml/Main.qml.in:710
 msgid "Abrir con ..."
 msgstr ""
 
-#: ../qml/Main.qml.in:704
+#: ../qml/Main.qml.in:732
 msgid "Atención"
 msgstr ""
 
-#: ../qml/Main.qml.in:705
+#: ../qml/Main.qml.in:733
 msgid "¿Estás seguro de querer borrar esta imágen?"
 msgstr ""
 
-#: ../qml/Main.qml.in:708
+#: ../qml/Main.qml.in:736
 msgid "Cancelar"
 msgstr ""
 
-#: ../qml/Main.qml.in:716
+#: ../qml/Main.qml.in:744
 msgid "Borrar"
 msgstr ""
 
-#: ../qml/Main.qml.in:796
+#: ../qml/Main.qml.in:834
 msgid "Opciones:"
-msgstr ""
-
-#: ../qml/Main_lomiri.qml:72 ../qml/Main_xenial.qml:72
-msgid "Mostrar álbumes ocultos"
 msgstr ""
 
 #: quickgal.desktop.in.h:1
